@@ -1,17 +1,14 @@
 import "./App.css";
-import LoginButton from "./components/header/auth/LoginButton";
-import LogoutButton from "./components/header/auth/LogoutButton";
-import { useAuth0 } from "@auth0/auth0-react";
+import { Route, Routes } from "react-router-dom";
+import Home from "./views/Home";
+import Login from "./views/Login";
 
 function App() {
-	const { user, getIdTokenClaims } = useAuth0();
-
-	getIdTokenClaims().then((c) => console.log(c));
-
 	return (
-		<>
-			<div>{user ? <LogoutButton /> : <LoginButton />}</div>
-		</>
+		<Routes>
+			<Route path="/" element={<Home />} />
+			<Route path="/login" element={<Login />} />
+		</Routes>
 	);
 }
 
