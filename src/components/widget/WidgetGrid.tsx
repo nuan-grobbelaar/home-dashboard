@@ -17,9 +17,13 @@ const WidgetGrid = (props: WidgetGridProps) => {
 		props.children
 	) as ReactElement[];
 
+	console.log(childrenArray);
+
 	const widgets: ReactElement<WidgetProps>[] = childrenArray.filter(
 		(c): c is ReactElement<WidgetProps> => c.type === Widget
 	);
+
+	console.log(widgets);
 
 	if (childrenArray.length > widgets.length)
 		console.error(
@@ -31,16 +35,24 @@ const WidgetGrid = (props: WidgetGridProps) => {
 	const widgetCells = widgets.reduce(
 		(count, w) =>
 			(count +=
-				(w.props.colEnd - w.props.colStart) *
-				(w.props.rowEnd - w.props.rowStart)),
+				(w.props.position.colEnd - w.props.position.colStart) *
+				(w.props.position.rowEnd - w.props.position.rowStart)),
 		0
 	);
 
 	const occupiedPositions: [number, number][] = widgets.reduce(
 		(arr: [number, number][], w) => {
 			const positions: [number, number][] = [];
-			for (let c = w.props.colStart; c < w.props.colEnd; c++) {
-				for (let r = w.props.rowStart; r < w.props.rowEnd; r++) {
+			for (
+				let c = w.props.position.colStart;
+				c < w.props.position.colEnd;
+				c++
+			) {
+				for (
+					let r = w.props.position.rowStart;
+					r < w.props.position.rowEnd;
+					r++
+				) {
 					positions.push([r, c]);
 				}
 			}
@@ -50,6 +62,7 @@ const WidgetGrid = (props: WidgetGridProps) => {
 	);
 
 	const fillers = [];
+	console.log(occupiedPositions);
 
 	for (let c = 1; c <= props.columns; c++) {
 		for (let r = 1; r <= props.rows; r++) {
@@ -63,12 +76,6 @@ const WidgetGrid = (props: WidgetGridProps) => {
 			}
 		}
 	}
-
-	// const fillCells = totalCells - widgetCells;
-
-	// const fillers = Array.from({ length: fillCells }, (_, i) => (
-	// 	<Filler key={`widget-filler-${i}`} />
-	// ));
 
 	return (
 		<div

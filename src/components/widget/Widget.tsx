@@ -1,18 +1,25 @@
 import type { PropsWithChildren } from "react";
 
 export interface WidgetProps extends PropsWithChildren {
-	colStart: number;
-	rowStart: number;
-	colEnd: number;
-	rowEnd: number;
+	type: string;
+	position: {
+		colStart: number;
+		rowStart: number;
+		colEnd: number;
+		rowEnd: number;
+	};
 }
+
+export const getWidgetId = (props: WidgetProps) => {
+	return `${props.type}-${props.position.colStart}-${props.position.rowStart}-${props.position.colEnd}-${props.position.rowEnd}`;
+};
 
 const Widget = (props: WidgetProps) => {
 	return (
 		<div
 			className="widget-grid__widget"
 			style={{
-				gridArea: `${props.colStart} / ${props.rowStart} / ${props.colEnd} / ${props.rowEnd}`,
+				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
 			}}
 		>
 			{props.children}
