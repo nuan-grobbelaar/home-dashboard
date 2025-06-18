@@ -1,18 +1,16 @@
 import type { PropsWithChildren, ReactElement } from "react";
 import React from "react";
 import Widget from "./Widget";
-import type { WidgetProps } from "./Widget";
+import type { WidgetPosition, WidgetProps } from "./Widget";
 import Filler from "./Filler";
-import type { FillerProps } from "./Filler";
 
 interface WidgetGridProps extends PropsWithChildren {
 	columns: number;
 	rows: number;
+	handleMouseDown: (row: number, col: number, e: React.MouseEvent) => void;
 }
 
 const WidgetGrid = (props: WidgetGridProps) => {
-	const totalCells = props.rows * props.columns;
-
 	const childrenArray = React.Children.toArray(
 		props.children
 	) as ReactElement[];
@@ -31,14 +29,6 @@ const WidgetGrid = (props: WidgetGridProps) => {
 				childrenArray.length - widgets.length
 			} child(ren) of WidgetGrid aren't Widgets`
 		);
-
-	const widgetCells = widgets.reduce(
-		(count, w) =>
-			(count +=
-				(w.props.position.colEnd - w.props.position.colStart) *
-				(w.props.position.rowEnd - w.props.position.rowStart)),
-		0
-	);
 
 	const occupiedPositions: [number, number][] = widgets.reduce(
 		(arr: [number, number][], w) => {
@@ -71,7 +61,12 @@ const WidgetGrid = (props: WidgetGridProps) => {
 			);
 			if (!isOccupied) {
 				fillers.push(
-					<Filler key={`widget-filler-${r}-${c}`} row={r} column={c} />
+					<Filler
+						key={`widget-filler-${r}-${c}`}
+						row={r}
+						column={c}
+						handleMouseDown={props.handleMouseDown}
+					/>
 				);
 			}
 		}

@@ -1,13 +1,15 @@
 import type { PropsWithChildren } from "react";
 
 export interface WidgetProps extends PropsWithChildren {
-	type: string;
-	position: {
-		colStart: number;
-		rowStart: number;
-		colEnd: number;
-		rowEnd: number;
-	};
+	type?: string;
+	position: WidgetPosition;
+}
+
+export interface WidgetPosition {
+	colStart: number;
+	rowStart: number;
+	colEnd: number;
+	rowEnd: number;
 }
 
 export const getWidgetId = (props: WidgetProps) => {
