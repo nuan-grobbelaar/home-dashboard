@@ -1,37 +1,50 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import Widget from "./Widget";
 import type { WidgetProps } from "./Widget";
-import Filler, { type FillerProps } from "./Filler";
+import Filler from "./Filler";
+import { useWidgetCreator } from "../../hooks/useWidgetCreator";
 
 interface WidgetGridProps extends PropsWithChildren {
 	columns: number;
 	rows: number;
-	selectedFiller: FillerProps[];
 }
 
 const WidgetGrid = (props: WidgetGridProps) => {
-	const childrenArray = React.Children.toArray(
-		props.children
-	) as ReactElement[];
+	const { selectedFiller, unsavedWidget, handleMouseUp, setOccupiedPositions } =
+		useWidgetCreator();
 
-	console.log(childrenArray);
+	useEffect(() => {
+		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));
+	}, []);
 
-	const widgets: ReactElement<WidgetProps>[] = childrenArray.filter(
-		(c): c is ReactElement<WidgetProps> => c.type === Widget
-	);
-
-	console.log(widgets);
-
-	if (childrenArray.length > widgets.length)
-		console.error(
-			`${
-				childrenArray.length - widgets.length
-			} child(ren) of WidgetGrid aren't Widgets`
+	const widgets = useMemo(() => {
+		const childrenArray = React.Children.toArray(
+			props.children
+		) as ReactElement[];
+		const baseWidgets = childrenArray.filter(
+			(c): c is ReactElement<WidgetProps> => c.type === Widget
 		);
 
-	const occupiedPositions: [number, number][] = widgets.reduce(
-		(arr: [number, number][], w) => {
+		if (childrenArray.length > baseWidgets.length)
+			console.error(
+				`${
+					childrenArray.length - baseWidgets.length
+				} child(ren) of WidgetGrid aren't Widgets`
+			);
+
+		if (unsavedWidget) {
+			return [
+				...baseWidgets,
+				<Widget {...unsavedWidget} unsaved key="unsaved" />,
+			];
+		}
+
+		return baseWidgets;
+	}, [props.children, unsavedWidget]);
+
+	const occupiedPositions = useMemo(() => {
+		return widgets.reduce<[number, number][]>((arr, w) => {
 			const positions: [number, number][] = [];
 			for (
 				let c = w.props.position.colStart;
@@ -47,9 +60,17 @@ const WidgetGrid = (props: WidgetGridProps) => {
 				}
 			}
 			return [...arr, ...positions];
-		},
-		[]
-	);
+		}, []);
+	}, [widgets]);
+
+	useEffect(() => {
+		console.log(
+			"isSelectionInUnoccupiedSpace",
+			"setting occupied",
+			occupiedPositions
+		);
+		setOccupiedPositions(occupiedPositions);
+	}, [occupiedPositions]);
 
 	const fillers = [];
 	console.log(occupiedPositions);
@@ -66,8 +87,8 @@ const WidgetGrid = (props: WidgetGridProps) => {
 						row={r}
 						column={c}
 						selected={
-							props.selectedFiller &&
-							props.selectedFiller.some(
+							selectedFiller &&
+							selectedFiller.some(
 								(props) => props.row === r && props.column === c
 							)
 						}

@@ -1,7 +1,8 @@
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 
 export interface WidgetProps extends PropsWithChildren {
 	type?: string;
+	unsaved?: boolean;
 	position: WidgetPosition;
 }
 
@@ -20,6 +21,7 @@ const Widget = (props: WidgetProps) => {
 	return (
 		<div
 			className="widget-grid__widget"
+			data-unsaved={props.unsaved}
 			style={{
 				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
 			}}

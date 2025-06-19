@@ -18,6 +18,10 @@
   height: 100%;
 }
 
+.widget-grid__widget[data-unsaved="true"] {
+  /* border: 2px dashed black; */
+}
+
 .widget-grid__filler {
   display: flex;
   justify-content: center;
@@ -29,5 +33,6 @@
 }
 
 .widget-grid__filler[data-selected="true"] {
-  border: 2px solid #555
+  border: 2px dashed black;
+  /* background-color: #ddd; */
 }

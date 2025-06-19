@@ -6,12 +6,14 @@ export interface WidgetState {
 	isDragging: boolean;
 	selectedFillers: FillerProps[];
 	unsavedWidget: WidgetProps | null;
+	occupiedPositions: [number, number][];
 }
 
 const initialState: WidgetState = {
 	isDragging: false,
 	selectedFillers: [],
 	unsavedWidget: null,
+	occupiedPositions: [],
 };
 
 const widgetSlice = createSlice({
@@ -26,6 +28,9 @@ const widgetSlice = createSlice({
 		},
 		setUnsavedWidget(state, action: PayloadAction<WidgetProps | null>) {
 			state.unsavedWidget = action.payload;
+		},
+		setOccupiedPositions(state, action: PayloadAction<[number, number][]>) {
+			state.occupiedPositions = action.payload;
 		},
 	},
 });

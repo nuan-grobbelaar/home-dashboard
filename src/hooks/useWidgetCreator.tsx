@@ -5,8 +5,16 @@ import { useDispatch } from "react-redux";
 import { widgetActions } from "../store/widget-slice";
 import { useAppSelector, type RootState } from "../store";
 
-export function useWidgetResizer() {
+export function useWidgetCreator() {
 	const dispatch = useDispatch();
+
+	const occupiedPositions = useAppSelector(
+		(state: RootState) => state.widget.occupiedPositions
+	);
+	const occupiedPositionsRef = useRef<[number, number][]>([]);
+	useEffect(() => {
+		occupiedPositionsRef.current = occupiedPositions;
+	}, [occupiedPositions]);
 
 	const isDragging = useAppSelector(
 		(state: RootState) => state.widget.isDragging
@@ -44,12 +52,17 @@ export function useWidgetResizer() {
 		dispatch(widgetActions.setUnsavedWidget(widget));
 	};
 
+	const setOccupiedPositions = (occupiedPositions: [number, number][]) => {
+		dispatch(widgetActions.setOccupiedPositions(occupiedPositions));
+	};
+
 	const addWidget = (widget: WidgetProps) => {
 		console.log("mouse up", widget);
 		setUnsavedWidget(widget);
 	};
 
 	const handleMouseDown = (filler: FillerProps, e: React.MouseEvent) => {
+		if (isDraggingRef.current) return;
 		setIsDragging(true);
 		setUnsavedWidget(null);
 		setSelected([filler]);
@@ -57,9 +70,52 @@ export function useWidgetResizer() {
 		e.preventDefault();
 	};
 
+	const isSelectionValid = (filler: FillerProps) => {
+		if (!isDraggingRef.current) return false;
+		if (selectedFillerRef.current.length === 0) return false;
+
+		let minRow = Infinity;
+		let maxRow = -Infinity;
+		let minCol = Infinity;
+		let maxCol = -Infinity;
+
+		console.log("isSelectionInUnoccupiedSpace", "occupied", occupiedPositions);
+
+		for (const s of [...selectedFillerRef.current, filler]) {
+			if (s.row < minRow) minRow = s.row;
+			if (s.row > maxRow) maxRow = s.row;
+			if (s.column < minCol) minCol = s.column;
+			if (s.column > maxCol) maxCol = s.column;
+		}
+
+		for (const [row, col] of occupiedPositionsRef.current) {
+			if (row >= minRow && row <= maxRow && col >= minCol && col <= maxCol)
+				return false;
+		}
+
+		// console.log(
+		// 	"isSelectionInUnoccupiedSpace",
+		// 	"new selection",
+		// 	`[${filler.row}, ${filler.column}]`
+		// );
+		// console.log(
+		// 	"isSelectionInUnoccupiedSpace",
+		// 	"min",
+		// 	`[${minRow}, ${minCol}]`
+		// );
+		// console.log(
+		// 	"isSelectionInUnoccupiedSpace",
+		// 	"max",
+		// 	`[${maxRow}, ${maxCol}]`
+		// );
+
+		return true;
+	};
+
 	const handleMouseEnter = (filler: FillerProps, e: React.MouseEvent) => {
-		if (!isDraggingRef.current || selectedFillerRef.current.length === 0)
+		if (!isSelectionValid(filler)) {
 			return;
+		}
 
 		const existingIndex = selectedFillerRef.current.findIndex(
 			(f) => f.row === filler.row && f.column === filler.column
@@ -73,6 +129,7 @@ export function useWidgetResizer() {
 	};
 
 	const handleMouseUp = (e: React.MouseEvent) => {
+		if (!isDraggingRef.current) return;
 		setIsDragging(false);
 		console.log("mouse up", "selected", selectedFillerRef.current);
 		addWidget({
@@ -90,6 +147,7 @@ export function useWidgetResizer() {
 					1,
 			},
 		});
+		setSelected([]);
 		console.log("dragging ended", isDragging);
 		e.preventDefault();
 	};
@@ -100,5 +158,6 @@ export function useWidgetResizer() {
 		handleMouseDown,
 		handleMouseEnter,
 		handleMouseUp,
+		setOccupiedPositions,
 	};
 }

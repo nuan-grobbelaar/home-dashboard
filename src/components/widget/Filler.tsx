@@ -1,4 +1,4 @@
-import { useWidgetResizer } from "../../hooks/useWidgetResizer";
+import { useWidgetCreator } from "../../hooks/useWidgetCreator";
 
 export interface FillerProps {
 	key: any;
@@ -8,7 +8,7 @@ export interface FillerProps {
 }
 
 const Filler = (props: FillerProps) => {
-	const { handleMouseDown, handleMouseEnter } = useWidgetResizer();
+	const { handleMouseDown, handleMouseEnter } = useWidgetCreator();
 
 	return (
 		<div
