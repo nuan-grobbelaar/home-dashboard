@@ -1,50 +1,104 @@
-import { useState } from "react";
-import type { WidgetPosition, WidgetProps } from "../components/widget/Widget";
+import { useEffect, useRef } from "react";
+import type { WidgetProps } from "../components/widget/Widget";
+import type { FillerProps } from "../components/widget/Filler";
+import { useDispatch } from "react-redux";
+import { widgetActions } from "../store/widget-slice";
+import { useAppSelector, type RootState } from "../store";
 
 export function useWidgetResizer() {
-	const [isDragging, setIsDragging] = useState(false);
-	const [widget, setWidget] = useState<WidgetProps | null>(null);
-	// const [position, setPosition] = useState({ x: 0, y: 0 });
+	const dispatch = useDispatch();
 
-	const addWidget = (widget: WidgetProps) => {
-		console.log("mouseDown", "hook", widget);
-		setWidget(widget);
+	const isDragging = useAppSelector(
+		(state: RootState) => state.widget.isDragging
+	);
+	const isDraggingRef = useRef(isDragging);
+	useEffect(() => {
+		isDraggingRef.current = isDragging;
+	}, [isDragging]);
+
+	const selectedFiller = useAppSelector(
+		(state) => state.widget.selectedFillers
+	);
+	const selectedFillerRef = useRef(selectedFiller);
+	useEffect(() => {
+		selectedFillerRef.current = selectedFiller;
+	}, [selectedFiller]);
+
+	const unsavedWidget = useAppSelector(
+		(state: RootState) => state.widget.unsavedWidget
+	);
+	const unsavedWidgetRef = useRef(unsavedWidget);
+	useEffect(() => {
+		unsavedWidgetRef.current = unsavedWidget;
+	}, [unsavedWidget]);
+
+	const setIsDragging = (isDragging: boolean) => {
+		dispatch(widgetActions.setIsDragging(isDragging));
 	};
 
-	const handleMouseDown = (row: number, col: number, e: React.MouseEvent) => {
-		console.log("mouseDown", row, col);
+	const setSelected = (fillers: FillerProps[]) => {
+		dispatch(widgetActions.setSelected(fillers));
+	};
+
+	const setUnsavedWidget = (widget: WidgetProps | null) => {
+		dispatch(widgetActions.setUnsavedWidget(widget));
+	};
+
+	const addWidget = (widget: WidgetProps) => {
+		console.log("mouse up", widget);
+		setUnsavedWidget(widget);
+	};
+
+	const handleMouseDown = (filler: FillerProps, e: React.MouseEvent) => {
 		setIsDragging(true);
-		addWidget({
-			position: {
-				rowStart: row,
-				rowEnd: row + 1,
-				colStart: col,
-				colEnd: col + 1,
-			},
-		});
+		setUnsavedWidget(null);
+		setSelected([filler]);
+		console.log("mouse down", "selected", selectedFillerRef.current);
 		e.preventDefault();
 	};
 
-	// const handleMouseMove = (e) => {
-	// 	if (!isDragging) return;
-	// 	setPosition({
-	// 		x: e.clientX,
-	// 		y: e.clientY,
-	// 	});
-	// };
+	const handleMouseEnter = (filler: FillerProps, e: React.MouseEvent) => {
+		if (!isDraggingRef.current || selectedFillerRef.current.length === 0)
+			return;
 
-	// const handleMouseEnter = (row: number, col: number) => {
-	// 	if (isDragging) {
-	// 		setEndCell({ row, col });
-	// 	}
-	// };
+		const existingIndex = selectedFillerRef.current.findIndex(
+			(f) => f.row === filler.row && f.column === filler.column
+		);
 
-	// const handleMouseUp = () => {
-	// 	if (isDragging) {
-	// 		setIsDragging(false);
-	// 		console.log("Drag ended at:", position);
-	// 	}
-	// };
+		if (existingIndex > -1)
+			setSelected(selectedFillerRef.current.slice(0, existingIndex + 1));
+		else setSelected([...selectedFillerRef.current, filler]);
 
-	return { widget, handleMouseDown };
+		e.preventDefault();
+	};
+
+	const handleMouseUp = (e: React.MouseEvent) => {
+		setIsDragging(false);
+		console.log("mouse up", "selected", selectedFillerRef.current);
+		addWidget({
+			position: {
+				rowStart: Math.min(
+					...selectedFillerRef.current.map((props) => props.row)
+				),
+				rowEnd:
+					Math.max(...selectedFillerRef.current.map((props) => props.row)) + 1,
+				colStart: Math.min(
+					...selectedFillerRef.current.map((props) => props.column)
+				),
+				colEnd:
+					Math.max(...selectedFillerRef.current.map((props) => props.column)) +
+					1,
+			},
+		});
+		console.log("dragging ended", isDragging);
+		e.preventDefault();
+	};
+
+	return {
+		selectedFiller,
+		unsavedWidget,
+		handleMouseDown,
+		handleMouseEnter,
+		handleMouseUp,
+	};
 }

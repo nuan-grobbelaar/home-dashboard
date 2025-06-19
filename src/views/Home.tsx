@@ -10,6 +10,7 @@ import Widget, {
 } from "../components/widget/Widget";
 import { useEffect, useState } from "react";
 import { useWidgetResizer } from "../hooks/useWidgetResizer";
+import LogoutButton from "../components/auth/LogoutButton";
 
 const db = getFirestore();
 
@@ -35,9 +36,11 @@ const Home = (props: HomeProps) => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
 	const [layoutsError, setLayoutsError] = useState<Error | null>(null);
 
-	const { widget: unsavedWidget, handleMouseDown } = useWidgetResizer();
+	const { selectedFiller, unsavedWidget, handleMouseUp } = useWidgetResizer();
 
-	console.log("mouseDown", "Home", unsavedWidget);
+	useEffect(() => {
+		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));
+	}, []);
 
 	useEffect(() => {
 		if (props.isAuthenticated) {
@@ -66,14 +69,14 @@ const Home = (props: HomeProps) => {
 		return <div>Error loading layouts: {layoutsError.message}</div>;
 	}
 
-	console.log(layouts[0].widgets);
-
 	return (
 		<div className="dashboard">
-			<WidgetGrid columns={5} rows={5} handleMouseDown={handleMouseDown}>
-				{layouts[0].widgets.map((widget: WidgetProps) => (
-					<Widget key={getWidgetId(widget)} {...widget}></Widget>
-				))}
+			{/* <LogoutButton /> */}
+			<WidgetGrid columns={5} rows={5} selectedFiller={selectedFiller}>
+				{layouts.length > 0 &&
+					layouts[0].widgets.map((widget: WidgetProps) => (
+						<Widget key={getWidgetId(widget)} {...widget}></Widget>
+					))}
 				{unsavedWidget && <Widget {...unsavedWidget}></Widget>}
 			</WidgetGrid>
 		</div>

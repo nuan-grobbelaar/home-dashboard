@@ -1,13 +1,13 @@
 import type { PropsWithChildren, ReactElement } from "react";
 import React from "react";
 import Widget from "./Widget";
-import type { WidgetPosition, WidgetProps } from "./Widget";
-import Filler from "./Filler";
+import type { WidgetProps } from "./Widget";
+import Filler, { type FillerProps } from "./Filler";
 
 interface WidgetGridProps extends PropsWithChildren {
 	columns: number;
 	rows: number;
-	handleMouseDown: (row: number, col: number, e: React.MouseEvent) => void;
+	selectedFiller: FillerProps[];
 }
 
 const WidgetGrid = (props: WidgetGridProps) => {
@@ -65,7 +65,12 @@ const WidgetGrid = (props: WidgetGridProps) => {
 						key={`widget-filler-${r}-${c}`}
 						row={r}
 						column={c}
-						handleMouseDown={props.handleMouseDown}
+						selected={
+							props.selectedFiller &&
+							props.selectedFiller.some(
+								(props) => props.row === r && props.column === c
+							)
+						}
 					/>
 				);
 			}

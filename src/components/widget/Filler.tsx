@@ -1,23 +1,23 @@
-import { useEffect } from "react";
-import type { WidgetPosition } from "./Widget";
 import { useWidgetResizer } from "../../hooks/useWidgetResizer";
 
 export interface FillerProps {
 	key: any;
 	row: number;
 	column: number;
-	handleMouseDown: (row: number, col: number, e: React.MouseEvent) => void;
+	selected?: boolean;
 }
 
 const Filler = (props: FillerProps) => {
+	const { handleMouseDown, handleMouseEnter } = useWidgetResizer();
+
 	return (
 		<div
 			className="widget-grid__filler"
-			onMouseDown={(e: React.MouseEvent) =>
-				props.handleMouseDown(props.row, props.column, e)
-			}
+			data-selected={props.selected}
+			onMouseDown={(e: React.MouseEvent) => handleMouseDown(props, e)}
+			onMouseEnter={(e: React.MouseEvent) => handleMouseEnter(props, e)}
 		>
-			{`[${props.row}, ${props.column}]`}
+			{/* {`[${props.row}, ${props.column}] ${props.selected ? "S" : ""}`} */}
 		</div>
 	);
 };
