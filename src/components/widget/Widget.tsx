@@ -1,8 +1,11 @@
 import { type PropsWithChildren } from "react";
+import WidgetTypeSelect from "./WidgetTypeSelect";
 
 export interface WidgetProps extends WidgetData, PropsWithChildren {
 	unsaved?: boolean;
-	removeUnsavedWidget: () => void;
+	isLoading?: boolean;
+	removeUnsavedWidget?: () => void;
+	onWidgetTypeSelect?: (widget: WidgetData) => void;
 }
 
 export interface WidgetPosition {
@@ -13,6 +16,7 @@ export interface WidgetPosition {
 }
 
 export interface WidgetData {
+	id?: any;
 	type?: string;
 	position: WidgetPosition;
 }
@@ -30,10 +34,31 @@ const Widget = (props: WidgetProps) => {
 				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
 			}}
 		>
+			{props.isLoading && "Loading"}
 			{props.unsaved && (
 				<button className="close-button" onClick={props.removeUnsavedWidget}>
 					x
 				</button>
+			)}
+			{props.unsaved && props.onWidgetTypeSelect && !props.isLoading && (
+				<WidgetTypeSelect
+					options={[
+						"todo",
+						"weather",
+						"transport",
+						"budget",
+						"recipes",
+						"calendar",
+						"xxxxxxxxxxxxxxxxxx",
+					]}
+					onSelect={(type: string) =>
+						props.onWidgetTypeSelect?.({
+							id: props.id,
+							position: props.position,
+							type: type,
+						})
+					}
+				/>
 			)}
 			{props.children}
 		</div>

@@ -6,6 +6,9 @@ import {
 	getDocs,
 	query,
 	where,
+	setDoc,
+	writeBatch,
+	doc,
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import WidgetGrid from "../components/widget/WidgetGrid";
@@ -19,7 +22,7 @@ import { useEffect, useState } from "react";
 const db = getFirestore();
 
 interface Layout {
-	id: any;
+	id?: any;
 	rows: number;
 	columns: number;
 	widgets: Array<WidgetData>;
@@ -48,7 +51,7 @@ async function getLayoutWidgets(layoutId: any) {
 	const querySnapshot = await getDocs(layoutWidgetsRef);
 	if (!querySnapshot.empty) {
 		return querySnapshot.docs.map(
-			(doc) => doc.data() as Omit<WidgetProps, "unsaved">
+			(doc) => ({ id: doc.id, ...doc.data() } as WidgetData)
 		);
 	} else {
 		console.log("No widgets found in layout.");
@@ -78,19 +81,56 @@ async function getActiveLayout() {
 		console.log("No active layout found.");
 		return null;
 	}
-	// const activeLayout: Layout = getDocs(activeLayoutRef).then((snapshot) =>
-	// 	snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-	// );
 }
 
-// function saveWidgetLayout() {
-// 	console.log("saving", layout);
-// }
+async function saveLayout(layout: Layout) {
+	const user = auth.currentUser;
+	if (!user) throw new Error("Not authenticated");
+
+	const layoutId = layout.id || crypto.randomUUID();
+
+	const layoutRef = doc(db, "users", user.uid, "widget-layouts", layoutId);
+	const widgetsRef = collection(layoutRef, "widgets");
+
+	const { widgets, id, ...layoutData } = layout;
+
+	await setDoc(layoutRef, layoutData, { merge: true });
+
+	const batch = writeBatch(db);
+
+	widgets.forEach((widget) => {
+		const widgetId = widget.id || crypto.randomUUID();
+		const widgetRef = doc(widgetsRef, widgetId);
+		const { id, ...widgetData } = widget;
+		batch.set(widgetRef, widgetData);
+	});
+
+	await batch.commit();
+}
 
 const Home = (props: HomeProps) => {
 	const [layout, setLayout] = useState<Layout | null>(null);
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
 	const [layoutsError, setLayoutsError] = useState<Error | null>(null);
+
+	function saveWidget(widget: WidgetData, layout: Layout) {
+		layout.widgets = [...layout.widgets, widget];
+		saveWidgetLayout(layout);
+	}
+
+	function saveWidgetLayout(layout: Layout) {
+		saveLayout(layout).then(() =>
+			getActiveLayout()
+				.then((data) => {
+					setLayout(data);
+					setLoadingLayouts(false);
+				})
+				.catch((error) => {
+					setLayoutsError(error);
+					setLoadingLayouts(false);
+				})
+		);
+	}
 
 	useEffect(() => {
 		if (props.isAuthenticated) {
@@ -125,10 +165,18 @@ const Home = (props: HomeProps) => {
 			<WidgetGrid
 				columns={layout ? layout.columns : 5}
 				rows={layout ? layout.rows : 5}
+				onWidgetTypeSelect={(widget: WidgetData) =>
+					saveWidget(
+						widget,
+						layout ? layout : { rows: 5, columns: 5, widgets: [] }
+					)
+				}
 			>
 				{layout &&
 					layout.widgets.map((widget: WidgetProps) => (
-						<Widget key={getWidgetId(widget)} {...widget}></Widget>
+						<Widget key={getWidgetId(widget)} {...widget}>
+							{widget.type}
+						</Widget>
 					))}
 			</WidgetGrid>
 		</div>

@@ -29,6 +29,10 @@ export function useWidgetCreator() {
 		setUnsavedWidget(null);
 	};
 
+	const setUnsavedWidgetToLoading = () => {
+		if (unsavedWidget) setUnsavedWidget({ ...unsavedWidget, isLoading: true });
+	};
+
 	const handleMouseDown = (filler: FillerProps, e: React.MouseEvent) => {
 		if (isDraggingRef.current) return;
 		setIsDragging(true);
@@ -60,22 +64,6 @@ export function useWidgetCreator() {
 			if (row >= minRow && row <= maxRow && col >= minCol && col <= maxCol)
 				return false;
 		}
-
-		// console.log(
-		// 	"isSelectionInUnoccupiedSpace",
-		// 	"new selection",
-		// 	`[${filler.row}, ${filler.column}]`
-		// );
-		// console.log(
-		// 	"isSelectionInUnoccupiedSpace",
-		// 	"min",
-		// 	`[${minRow}, ${minCol}]`
-		// );
-		// console.log(
-		// 	"isSelectionInUnoccupiedSpace",
-		// 	"max",
-		// 	`[${maxRow}, ${maxCol}]`
-		// );
 
 		return true;
 	};
@@ -123,6 +111,7 @@ export function useWidgetCreator() {
 	return {
 		selectedFiller,
 		unsavedWidget,
+		setUnsavedWidgetToLoading,
 		removeUnsavedWidget,
 		handleMouseDown,
 		handleMouseEnter,

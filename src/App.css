@@ -17,10 +17,16 @@
   border: 2px solid black;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  color: black;
 }
 
 .widget-grid__widget[data-unsaved="true"] {
   border: 2px dashed black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* padding: 10%; */
 }
 
 .widget-grid__widget .close-button {
@@ -45,4 +51,49 @@
 .widget-grid__filler[data-selected="true"] {
   border: 2px dashed black;
   /* background-color: #ddd; */
+}
+
+.widget__widget-type-select {
+  border: 1.5px solid black;
+  padding: 8px;
+  max-width: 50%;
+  max-height: 50%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Firefox */
+  scrollbar-width: none;
+  /* Internet Explorer and Edge */
+  -ms-overflow-style: none;
+}
+
+.widget__widget-type-select__option {
+  color: black;
+}
+
+.widget__widget-type-select__option:hover {
+  text-decoration: underline;
+}
+
+.scroll-animate {
+  animation: scroll-reset 6s infinite;
+}
+
+@keyframes scroll-reset {
+  0% {
+    transform: translateX(0%);
+  }
+
+  80% {
+    transform: translateX(-100%);
+  }
+
+  95% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
 }

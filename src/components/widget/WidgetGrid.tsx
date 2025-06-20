@@ -1,13 +1,14 @@
 import type { PropsWithChildren, ReactElement } from "react";
 import React, { useEffect, useMemo } from "react";
 import Widget from "./Widget";
-import type { WidgetProps } from "./Widget";
+import type { WidgetData, WidgetProps } from "./Widget";
 import Filler from "./Filler";
 import { useWidgetCreator } from "../../hooks/useWidgetCreator";
 
 interface WidgetGridProps extends PropsWithChildren {
 	columns: number;
 	rows: number;
+	onWidgetTypeSelect?: (widget: WidgetData) => void;
 }
 
 const WidgetGrid = (props: WidgetGridProps) => {
@@ -15,6 +16,7 @@ const WidgetGrid = (props: WidgetGridProps) => {
 		selectedFiller,
 		unsavedWidget,
 		removeUnsavedWidget,
+		setUnsavedWidgetToLoading,
 		handleMouseUp,
 		handleMouseDown,
 		handleMouseEnter,
@@ -24,6 +26,17 @@ const WidgetGrid = (props: WidgetGridProps) => {
 	useEffect(() => {
 		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));
 	}, []);
+
+	useEffect(() => {
+		removeUnsavedWidget();
+	}, [props.children]);
+
+	const onWidgetTypeSelect = (widget: WidgetData) => {
+		props.onWidgetTypeSelect
+			? props.onWidgetTypeSelect(widget)
+			: console.error("onWidgetTypeSelect is udnefined");
+		setUnsavedWidgetToLoading();
+	};
 
 	const widgets = useMemo(() => {
 		const childrenArray = React.Children.toArray(
@@ -47,6 +60,7 @@ const WidgetGrid = (props: WidgetGridProps) => {
 					{...unsavedWidget}
 					unsaved
 					removeUnsavedWidget={removeUnsavedWidget}
+					onWidgetTypeSelect={onWidgetTypeSelect}
 					key="unsaved"
 				/>,
 			];
