@@ -1,60 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { WidgetProps } from "../components/widget/Widget";
 import type { FillerProps } from "../components/widget/Filler";
-import { useDispatch } from "react-redux";
-import { widgetActions } from "../store/widget-slice";
-import { useAppSelector, type RootState } from "../store";
 
 export function useWidgetCreator() {
-	const dispatch = useDispatch();
+	const [isDragging, setIsDragging] = useState(false);
+	const [selectedFiller, setSelectedFiller] = useState<FillerProps[]>([]);
+	const [unsavedWidget, setUnsavedWidget] = useState<WidgetProps | null>(null);
+	const [occupiedPositions, setOccupiedPositions] = useState<
+		[number, number][]
+	>([]);
 
-	const occupiedPositions = useAppSelector(
-		(state: RootState) => state.widget.occupiedPositions
-	);
-	const occupiedPositionsRef = useRef<[number, number][]>([]);
-	useEffect(() => {
-		occupiedPositionsRef.current = occupiedPositions;
-	}, [occupiedPositions]);
-
-	const isDragging = useAppSelector(
-		(state: RootState) => state.widget.isDragging
-	);
 	const isDraggingRef = useRef(isDragging);
 	useEffect(() => {
 		isDraggingRef.current = isDragging;
 	}, [isDragging]);
 
-	const selectedFiller = useAppSelector(
-		(state) => state.widget.selectedFillers
-	);
 	const selectedFillerRef = useRef(selectedFiller);
 	useEffect(() => {
 		selectedFillerRef.current = selectedFiller;
 	}, [selectedFiller]);
-
-	const unsavedWidget = useAppSelector(
-		(state: RootState) => state.widget.unsavedWidget
-	);
-	const unsavedWidgetRef = useRef(unsavedWidget);
-	useEffect(() => {
-		unsavedWidgetRef.current = unsavedWidget;
-	}, [unsavedWidget]);
-
-	const setIsDragging = (isDragging: boolean) => {
-		dispatch(widgetActions.setIsDragging(isDragging));
-	};
-
-	const setSelected = (fillers: FillerProps[]) => {
-		dispatch(widgetActions.setSelected(fillers));
-	};
-
-	const setUnsavedWidget = (widget: WidgetProps | null) => {
-		dispatch(widgetActions.setUnsavedWidget(widget));
-	};
-
-	const setOccupiedPositions = (occupiedPositions: [number, number][]) => {
-		dispatch(widgetActions.setOccupiedPositions(occupiedPositions));
-	};
 
 	const addWidget = (widget: WidgetProps) => {
 		console.log("mouse up", widget);
@@ -65,7 +29,7 @@ export function useWidgetCreator() {
 		if (isDraggingRef.current) return;
 		setIsDragging(true);
 		setUnsavedWidget(null);
-		setSelected([filler]);
+		setSelectedFiller([filler]);
 		console.log("mouse down", "selected", selectedFillerRef.current);
 		e.preventDefault();
 	};
@@ -88,7 +52,7 @@ export function useWidgetCreator() {
 			if (s.column > maxCol) maxCol = s.column;
 		}
 
-		for (const [row, col] of occupiedPositionsRef.current) {
+		for (const [row, col] of occupiedPositions) {
 			if (row >= minRow && row <= maxRow && col >= minCol && col <= maxCol)
 				return false;
 		}
@@ -122,16 +86,16 @@ export function useWidgetCreator() {
 		);
 
 		if (existingIndex > -1)
-			setSelected(selectedFillerRef.current.slice(0, existingIndex + 1));
-		else setSelected([...selectedFillerRef.current, filler]);
+			setSelectedFiller(selectedFillerRef.current.slice(0, existingIndex + 1));
+		else setSelectedFiller([...selectedFillerRef.current, filler]);
 
 		e.preventDefault();
 	};
 
 	const handleMouseUp = (e: React.MouseEvent) => {
+		console.log("mouse up", isDragging, "selected", selectedFillerRef.current);
 		if (!isDraggingRef.current) return;
 		setIsDragging(false);
-		console.log("mouse up", "selected", selectedFillerRef.current);
 		addWidget({
 			position: {
 				rowStart: Math.min(
@@ -147,7 +111,7 @@ export function useWidgetCreator() {
 					1,
 			},
 		});
-		setSelected([]);
+		setSelectedFiller([]);
 		console.log("dragging ended", isDragging);
 		e.preventDefault();
 	};

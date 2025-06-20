@@ -11,8 +11,14 @@ interface WidgetGridProps extends PropsWithChildren {
 }
 
 const WidgetGrid = (props: WidgetGridProps) => {
-	const { selectedFiller, unsavedWidget, handleMouseUp, setOccupiedPositions } =
-		useWidgetCreator();
+	const {
+		selectedFiller,
+		unsavedWidget,
+		handleMouseUp,
+		handleMouseDown,
+		handleMouseEnter,
+		setOccupiedPositions,
+	} = useWidgetCreator();
 
 	useEffect(() => {
 		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));
@@ -92,6 +98,8 @@ const WidgetGrid = (props: WidgetGridProps) => {
 								(props) => props.row === r && props.column === c
 							)
 						}
+						handleMouseDown={handleMouseDown}
+						handleMouseEnter={handleMouseEnter}
 					/>
 				);
 			}
