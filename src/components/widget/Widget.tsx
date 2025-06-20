@@ -4,6 +4,7 @@ import WidgetTypeSelect from "./WidgetTypeSelect";
 export interface WidgetProps extends WidgetData, PropsWithChildren {
 	unsaved?: boolean;
 	isLoading?: boolean;
+	editMode?: boolean;
 	removeUnsavedWidget?: () => void;
 	onWidgetTypeSelect?: (widget: WidgetData) => void;
 }
@@ -35,7 +36,7 @@ const Widget = (props: WidgetProps) => {
 			}}
 		>
 			{props.isLoading && "Loading"}
-			{props.unsaved && (
+			{(props.unsaved || props.editMode) && (
 				<button className="close-button" onClick={props.removeUnsavedWidget}>
 					x
 				</button>

@@ -77,7 +77,7 @@
 }
 
 .scroll-animate {
-  animation: scroll-reset 6s infinite;
+  animation: scroll-reset 10s infinite;
 }
 
 @keyframes scroll-reset {

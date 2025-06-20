@@ -174,7 +174,7 @@ const Home = (props: HomeProps) => {
 			>
 				{layout &&
 					layout.widgets.map((widget: WidgetProps) => (
-						<Widget key={getWidgetId(widget)} {...widget}>
+						<Widget key={getWidgetId(widget)} {...widget} editMode>
 							{widget.type}
 						</Widget>
 					))}
