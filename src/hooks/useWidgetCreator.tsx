@@ -25,6 +25,10 @@ export function useWidgetCreator() {
 		setUnsavedWidget(widget);
 	};
 
+	const removeUnsavedWidget = () => {
+		setUnsavedWidget(null);
+	};
+
 	const handleMouseDown = (filler: FillerProps, e: React.MouseEvent) => {
 		if (isDraggingRef.current) return;
 		setIsDragging(true);
@@ -119,6 +123,7 @@ export function useWidgetCreator() {
 	return {
 		selectedFiller,
 		unsavedWidget,
+		removeUnsavedWidget,
 		handleMouseDown,
 		handleMouseEnter,
 		handleMouseUp,

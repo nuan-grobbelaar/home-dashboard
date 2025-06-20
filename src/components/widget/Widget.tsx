@@ -1,9 +1,8 @@
 import { type PropsWithChildren } from "react";
 
-export interface WidgetProps extends PropsWithChildren {
-	type?: string;
+export interface WidgetProps extends WidgetData, PropsWithChildren {
 	unsaved?: boolean;
-	position: WidgetPosition;
+	removeUnsavedWidget: () => void;
 }
 
 export interface WidgetPosition {
@@ -11,6 +10,11 @@ export interface WidgetPosition {
 	rowStart: number;
 	colEnd: number;
 	rowEnd: number;
+}
+
+export interface WidgetData {
+	type?: string;
+	position: WidgetPosition;
 }
 
 export const getWidgetId = (props: WidgetProps) => {
@@ -26,6 +30,11 @@ const Widget = (props: WidgetProps) => {
 				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
 			}}
 		>
+			{props.unsaved && (
+				<button className="close-button" onClick={props.removeUnsavedWidget}>
+					x
+				</button>
+			)}
 			{props.children}
 		</div>
 	);

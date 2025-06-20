@@ -14,6 +14,7 @@ const WidgetGrid = (props: WidgetGridProps) => {
 	const {
 		selectedFiller,
 		unsavedWidget,
+		removeUnsavedWidget,
 		handleMouseUp,
 		handleMouseDown,
 		handleMouseEnter,
@@ -42,7 +43,12 @@ const WidgetGrid = (props: WidgetGridProps) => {
 		if (unsavedWidget) {
 			return [
 				...baseWidgets,
-				<Widget {...unsavedWidget} unsaved key="unsaved" />,
+				<Widget
+					{...unsavedWidget}
+					unsaved
+					removeUnsavedWidget={removeUnsavedWidget}
+					key="unsaved"
+				/>,
 			];
 		}
 
@@ -81,8 +87,8 @@ const WidgetGrid = (props: WidgetGridProps) => {
 	const fillers = [];
 	console.log(occupiedPositions);
 
-	for (let c = 1; c <= props.columns; c++) {
-		for (let r = 1; r <= props.rows; r++) {
+	for (let c = 1; c <= props.rows; c++) {
+		for (let r = 1; r <= props.columns; r++) {
 			const isOccupied = occupiedPositions.some(
 				([row, col]) => row === r && col === c
 			);
