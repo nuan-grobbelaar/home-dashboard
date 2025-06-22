@@ -1,41 +1,46 @@
 import type { PropsWithChildren, ReactElement } from "react";
 import React, { useEffect, useMemo } from "react";
-import Widget from "./Widget";
-import type { WidgetData, WidgetProps } from "./Widget";
 import Filler from "./Filler";
-import { useGridItemPlacer } from "../../hooks/useGridItemPlacer";
+import {
+	useGridItemPlacer,
+	type GridItem,
+} from "../../hooks/useGridItemPlacer";
 
-interface WidgetGridProps extends PropsWithChildren {
+interface GridProps<P extends GridItem> extends PropsWithChildren {
 	columns: number;
 	rows: number;
-	onWidgetTypeSelect?: (widget: WidgetData) => void;
+	onSaveGridItem: (item: GridItem) => void;
+
+	ItemComponent: React.ComponentType<P>;
 }
 
-const WidgetGrid = (props: WidgetGridProps) => {
+const Grid = <P extends GridItem>(props: GridProps<P>) => {
+	type ItemComponentProps = P;
+
 	const {
 		selectedFiller,
-		placedGridItem: unsavedWidget,
-		removePlacedItem: removeUnsavedWidget,
-		setPlacedItemToLoading: setUnsavedWidgetToLoading,
+		placedGridItem,
+		removePlacedItem,
+		setPlacedItemToLoading,
 		handleMouseUp,
 		handleMouseDown,
 		handleMouseEnter,
 		setOccupiedPositions,
-	} = useGridItemPlacer<WidgetProps>();
+	} = useGridItemPlacer<ItemComponentProps>();
 
 	useEffect(() => {
 		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));
 	}, []);
 
 	useEffect(() => {
-		removeUnsavedWidget();
+		removePlacedItem();
 	}, [props.children]);
 
-	const onWidgetTypeSelect = (widget: WidgetData) => {
-		props.onWidgetTypeSelect
-			? props.onWidgetTypeSelect(widget)
+	const onSaveGridItem = (item: GridItem) => {
+		props.onSaveGridItem
+			? props.onSaveGridItem(item)
 			: console.error("onWidgetTypeSelect is udnefined");
-		setUnsavedWidgetToLoading();
+		setPlacedItemToLoading();
 	};
 
 	const widgets = useMemo(() => {
@@ -43,7 +48,7 @@ const WidgetGrid = (props: WidgetGridProps) => {
 			props.children
 		) as ReactElement[];
 		const baseWidgets = childrenArray.filter(
-			(c): c is ReactElement<WidgetProps> => c.type === Widget
+			(c): c is ReactElement<P> => c.type === props.ItemComponent
 		);
 
 		if (childrenArray.length > baseWidgets.length)
@@ -53,21 +58,21 @@ const WidgetGrid = (props: WidgetGridProps) => {
 				} child(ren) of WidgetGrid aren't Widgets`
 			);
 
-		if (unsavedWidget) {
+		if (placedGridItem) {
 			return [
 				...baseWidgets,
-				<Widget
-					{...unsavedWidget}
+				<props.ItemComponent
+					{...placedGridItem}
 					unsaved
-					removeWidget={removeUnsavedWidget}
-					onWidgetTypeSelect={onWidgetTypeSelect}
+					removeItem={removePlacedItem}
+					onSave={onSaveGridItem}
 					key="unsaved"
 				/>,
 			];
 		}
 
 		return baseWidgets;
-	}, [props.children, unsavedWidget]);
+	}, [props.children, placedGridItem]);
 
 	const occupiedPositions = useMemo(() => {
 		return widgets.reduce<[number, number][]>((arr, w) => {
@@ -140,4 +145,4 @@ const WidgetGrid = (props: WidgetGridProps) => {
 	);
 };
 
-export default WidgetGrid;
+export default Grid;

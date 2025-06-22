@@ -13,6 +13,8 @@ export interface GridItem {
 	unsaved?: boolean;
 	isLoading?: boolean;
 	editMode?: boolean;
+	onSave?: (item: any) => void;
+	removeItem?: (id?: string) => void;
 }
 
 export function useGridItemPlacer<T extends GridItem>() {
@@ -38,7 +40,7 @@ export function useGridItemPlacer<T extends GridItem>() {
 		setPlacedItem(item);
 	};
 
-	const removePlacedItem = () => {
+	const removePlacedItem = (id?: string) => {
 		setPlacedItem(null);
 	};
 

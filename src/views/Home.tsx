@@ -1,4 +1,4 @@
-import WidgetGrid from "../components/widget/WidgetGrid";
+import Grid from "../components/widget/Grid";
 import Widget, {
 	getWidgetId,
 	type WidgetData,
@@ -42,26 +42,33 @@ const Home = () => {
 		<div className="dashboard">
 			{/* <LogoutButton /> */}
 			{activeLayout && (
-				<WidgetGrid
+				<Grid
+					ItemComponent={Widget}
 					columns={activeLayout.columns}
 					rows={activeLayout.rows}
-					onWidgetTypeSelect={(widget: WidgetData) => {
-						saveWidget(activeLayout.id, widget);
+					onSaveGridItem={(item: WidgetProps) => {
+						saveWidget(activeLayout.id, {
+							id: item.id,
+							position: item.position,
+							type: item.type,
+						});
 					}}
 				>
 					{activeLayout.widgets.map((widget: WidgetProps) => (
 						<Widget
 							key={getWidgetId(widget)}
 							{...widget}
-							removeWidget={(widgetId: string) =>
-								deleteWidget(activeLayout.id, widgetId)
+							removeItem={(id?: string) =>
+								id ? deleteWidget(activeLayout.id, id) : null
 							}
 							editMode
+							rows={9}
+							columns={9}
 						>
 							{widget.type}
 						</Widget>
 					))}
-				</WidgetGrid>
+				</Grid>
 			)}
 		</div>
 	);
