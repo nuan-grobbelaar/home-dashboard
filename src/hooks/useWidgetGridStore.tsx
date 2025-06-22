@@ -7,6 +7,7 @@ import {
 	setDoc,
 	writeBatch,
 	doc,
+	deleteDoc,
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
@@ -114,6 +115,28 @@ export function useWidgetGridStore(
 			});
 	}
 
+	function deleteWidget(layoutId: string, widgetId: string) {
+		const user = auth.currentUser;
+		if (!user) throw new Error("Not authenticated");
+
+		const widgetRef = doc(
+			db,
+			"users",
+			user.uid,
+			"widget-layouts",
+			layoutId,
+			"widgets",
+			widgetId
+		);
+
+		deleteDoc(widgetRef)
+			.then(() => loadActiveLayout(true))
+			.catch((err) => {
+				setError(err.message || String(err));
+				throw err;
+			});
+	}
+
 	function saveLayout(layout: Layout) {
 		const user = auth.currentUser;
 		if (!user) throw new Error("Not authenticated");
@@ -148,5 +171,5 @@ export function useWidgetGridStore(
 			});
 	}
 
-	return { activeLayout, saveWidget, saveLayout };
+	return { activeLayout, saveWidget, deleteWidget, saveLayout };
 }

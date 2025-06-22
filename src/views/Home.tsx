@@ -25,7 +25,7 @@ const Home = () => {
 		error: firebaseAuthError,
 	} = useFirebaseAuth();
 
-	const { activeLayout, saveWidget } = useWidgetGridStore(
+	const { activeLayout, saveWidget, deleteWidget } = useWidgetGridStore(
 		setLoadingLayouts,
 		setLayoutsError
 	);
@@ -50,7 +50,14 @@ const Home = () => {
 					}}
 				>
 					{activeLayout.widgets.map((widget: WidgetProps) => (
-						<Widget key={getWidgetId(widget)} {...widget} editMode>
+						<Widget
+							key={getWidgetId(widget)}
+							{...widget}
+							removeWidget={(widgetId: string) =>
+								deleteWidget(activeLayout.id, widgetId)
+							}
+							editMode
+						>
 							{widget.type}
 						</Widget>
 					))}

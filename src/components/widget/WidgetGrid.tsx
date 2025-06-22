@@ -59,7 +59,7 @@ const WidgetGrid = (props: WidgetGridProps) => {
 				<Widget
 					{...unsavedWidget}
 					unsaved
-					removeUnsavedWidget={removeUnsavedWidget}
+					removeWidget={removeUnsavedWidget}
 					onWidgetTypeSelect={onWidgetTypeSelect}
 					key="unsaved"
 				/>,
