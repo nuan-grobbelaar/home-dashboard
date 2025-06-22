@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from "react";
 import Widget from "./Widget";
 import type { WidgetData, WidgetProps } from "./Widget";
 import Filler from "./Filler";
-import { useWidgetCreator } from "../../hooks/useWidgetCreator";
+import { useGridItemPlacer } from "../../hooks/useGridItemPlacer";
 
 interface WidgetGridProps extends PropsWithChildren {
 	columns: number;
@@ -14,14 +14,14 @@ interface WidgetGridProps extends PropsWithChildren {
 const WidgetGrid = (props: WidgetGridProps) => {
 	const {
 		selectedFiller,
-		unsavedWidget,
-		removeUnsavedWidget,
-		setUnsavedWidgetToLoading,
+		placedGridItem: unsavedWidget,
+		removePlacedItem: removeUnsavedWidget,
+		setPlacedItemToLoading: setUnsavedWidgetToLoading,
 		handleMouseUp,
 		handleMouseDown,
 		handleMouseEnter,
 		setOccupiedPositions,
-	} = useWidgetCreator();
+	} = useGridItemPlacer<WidgetProps>();
 
 	useEffect(() => {
 		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));

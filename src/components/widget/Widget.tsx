@@ -1,25 +1,18 @@
 import { type PropsWithChildren } from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
-
-export interface WidgetProps extends WidgetData, PropsWithChildren {
-	unsaved?: boolean;
-	isLoading?: boolean;
-	editMode?: boolean;
-	removeWidget?: (widgetId: string) => void;
-	onWidgetTypeSelect?: (widget: WidgetData) => void;
-}
-
-export interface WidgetPosition {
-	colStart: number;
-	rowStart: number;
-	colEnd: number;
-	rowEnd: number;
-}
+import type { GridItem, GridItemPosition } from "../../hooks/useGridItemPlacer";
 
 export interface WidgetData {
 	id?: any;
 	type?: string;
-	position: WidgetPosition;
+	position: GridItemPosition;
+}
+
+export interface WidgetProps extends GridItem, PropsWithChildren {
+	id?: any;
+	type?: string;
+	removeWidget?: (widgetId: string) => void;
+	onWidgetTypeSelect?: (widget: WidgetData) => void;
 }
 
 export const getWidgetId = (props: WidgetProps) => {

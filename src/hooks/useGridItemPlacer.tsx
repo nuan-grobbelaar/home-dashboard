@@ -1,11 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import type { WidgetProps } from "../components/widget/Widget";
 import type { FillerProps } from "../components/widget/Filler";
 
-export function useWidgetCreator() {
+export interface GridItemPosition {
+	colStart: number;
+	rowStart: number;
+	colEnd: number;
+	rowEnd: number;
+}
+
+export interface GridItem {
+	position: GridItemPosition;
+	unsaved?: boolean;
+	isLoading?: boolean;
+	editMode?: boolean;
+}
+
+export function useGridItemPlacer<T extends GridItem>() {
 	const [isDragging, setIsDragging] = useState(false);
 	const [selectedFiller, setSelectedFiller] = useState<FillerProps[]>([]);
-	const [unsavedWidget, setUnsavedWidget] = useState<WidgetProps | null>(null);
+	const [placedGridItem, setPlacedItem] = useState<T | null>(null);
 	const [occupiedPositions, setOccupiedPositions] = useState<
 		[number, number][]
 	>([]);
@@ -20,23 +33,23 @@ export function useWidgetCreator() {
 		selectedFillerRef.current = selectedFiller;
 	}, [selectedFiller]);
 
-	const addWidget = (widget: WidgetProps) => {
-		console.log("mouse up", widget);
-		setUnsavedWidget(widget);
+	const addGridItem = (item: T) => {
+		console.log("mouse up", item);
+		setPlacedItem(item);
 	};
 
-	const removeUnsavedWidget = () => {
-		setUnsavedWidget(null);
+	const removePlacedItem = () => {
+		setPlacedItem(null);
 	};
 
-	const setUnsavedWidgetToLoading = () => {
-		if (unsavedWidget) setUnsavedWidget({ ...unsavedWidget, isLoading: true });
+	const setPlacedItemToLoading = () => {
+		if (placedGridItem) setPlacedItem({ ...placedGridItem, isLoading: true });
 	};
 
 	const handleMouseDown = (filler: FillerProps, e: React.MouseEvent) => {
 		if (isDraggingRef.current) return;
 		setIsDragging(true);
-		setUnsavedWidget(null);
+		setPlacedItem(null);
 		setSelectedFiller([filler]);
 		console.log("mouse down", "selected", selectedFillerRef.current);
 		e.preventDefault();
@@ -88,7 +101,7 @@ export function useWidgetCreator() {
 		console.log("mouse up", isDragging, "selected", selectedFillerRef.current);
 		if (!isDraggingRef.current) return;
 		setIsDragging(false);
-		addWidget({
+		addGridItem({
 			position: {
 				rowStart: Math.min(
 					...selectedFillerRef.current.map((props) => props.row)
@@ -102,7 +115,7 @@ export function useWidgetCreator() {
 					Math.max(...selectedFillerRef.current.map((props) => props.column)) +
 					1,
 			},
-		});
+		} as T);
 		setSelectedFiller([]);
 		console.log("dragging ended", isDragging);
 		e.preventDefault();
@@ -110,9 +123,9 @@ export function useWidgetCreator() {
 
 	return {
 		selectedFiller,
-		unsavedWidget,
-		setUnsavedWidgetToLoading,
-		removeUnsavedWidget,
+		placedGridItem,
+		setPlacedItemToLoading,
+		removePlacedItem,
 		handleMouseDown,
 		handleMouseEnter,
 		handleMouseUp,
