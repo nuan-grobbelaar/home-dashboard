@@ -17,7 +17,24 @@ export interface GridItem {
 	removeItem?: (id?: string) => void;
 }
 
-export function useGridItemPlacer<T extends GridItem>() {
+export type PlacerMode = "NONE" | "CELL_DRAG";
+
+export function useGridItemPlacer<T extends GridItem>(
+	mode: PlacerMode = "CELL_DRAG"
+) {
+	if (mode === "NONE") {
+		return {
+			selectedFiller: [],
+			placedGridItem: null,
+			setPlacedItemToLoading: () => {},
+			removePlacedItem: () => {},
+			handleMouseDown: () => {},
+			handleMouseEnter: () => {},
+			handleMouseUp: () => {},
+			setOccupiedPositions: () => {},
+		};
+	}
+
 	const [isDragging, setIsDragging] = useState(false);
 	const [selectedFiller, setSelectedFiller] = useState<FillerProps[]>([]);
 	const [placedGridItem, setPlacedItem] = useState<T | null>(null);

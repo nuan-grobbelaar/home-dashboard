@@ -1,6 +1,9 @@
 import { type PropsWithChildren } from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
 import type { GridItem, GridItemPosition } from "../../hooks/useGridItemPlacer";
+import Grid from "./Grid";
+import WidgetComponent from "./WidgetComponent";
+import Barchart from "../Barchart";
 
 export interface WidgetData {
 	id?: any;
@@ -11,7 +14,7 @@ export interface WidgetData {
 export interface WidgetProps extends GridItem, PropsWithChildren {
 	id?: any;
 	type?: string;
-	columns?: number;
+	columns?: number; //TODO: why do these have to be generic?
 	rows?: number;
 }
 
@@ -54,17 +57,21 @@ const Widget = (props: WidgetProps) => {
 					]}
 					onSelect={(type: string) => props.onSave?.({ ...props, type: type })}
 				/>
-			) : (
-				<div
-					className="widget-grid__widget__grid"
-					style={{
-						gridTemplateColumns: `repeat(${props.columns}, 1fr)`,
-						gridTemplateRows: `repeat(${props.rows}, 1fr)`,
-					}}
+			) : props.columns && props.rows ? (
+				<Grid
+					ItemComponent={WidgetComponent}
+					columns={props.columns}
+					rows={props.rows}
+					onSaveGridItem={(item: GridItem) => {}}
+					placerMode="NONE"
 				>
-					{props.children}
-				</div>
-			)}
+					<WidgetComponent
+						position={{ rowStart: 1, rowEnd: 5, colStart: 1, colEnd: 5 }}
+					>
+						<Barchart />
+					</WidgetComponent>
+				</Grid>
+			) : null}
 		</div>
 	);
 };

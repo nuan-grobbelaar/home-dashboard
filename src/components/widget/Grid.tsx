@@ -4,11 +4,13 @@ import Filler from "./Filler";
 import {
 	useGridItemPlacer,
 	type GridItem,
+	type PlacerMode,
 } from "../../hooks/useGridItemPlacer";
 
 interface GridProps<P extends GridItem> extends PropsWithChildren {
 	columns: number;
 	rows: number;
+	placerMode?: PlacerMode;
 	onSaveGridItem: (item: GridItem) => void;
 
 	ItemComponent: React.ComponentType<P>;
@@ -26,7 +28,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 		handleMouseDown,
 		handleMouseEnter,
 		setOccupiedPositions,
-	} = useGridItemPlacer<ItemComponentProps>();
+	} = useGridItemPlacer<ItemComponentProps>(props.placerMode);
 
 	useEffect(() => {
 		window.addEventListener("mouseup", (e: any) => handleMouseUp(e));
@@ -39,7 +41,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 	const onSaveGridItem = (item: GridItem) => {
 		props.onSaveGridItem
 			? props.onSaveGridItem(item)
-			: console.error("onWidgetTypeSelect is udnefined");
+			: console.error("onSaveGridItem is udnefined");
 		setPlacedItemToLoading();
 	};
 
@@ -55,7 +57,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 			console.error(
 				`${
 					childrenArray.length - baseWidgets.length
-				} child(ren) of WidgetGrid aren't Widgets`
+				} child(ren) of Grid aren't GridItems`
 			);
 
 		if (placedGridItem) {

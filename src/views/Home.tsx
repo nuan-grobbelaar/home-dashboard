@@ -61,9 +61,9 @@ const Home = () => {
 							removeItem={(id?: string) =>
 								id ? deleteWidget(activeLayout.id, id) : null
 							}
-							editMode
-							rows={9}
-							columns={9}
+							editMode={true}
+							rows={4}
+							columns={4}
 						>
 							{widget.type}
 						</Widget>
