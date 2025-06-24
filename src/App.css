@@ -119,3 +119,33 @@
   justify-content: center;
   align-items: center;
 }
+
+.barchart__bar {
+  stroke: black;
+  stroke-width: 1.5px;
+  transition: y 0.6s ease, height 0.6s ease;
+  /* optionally fill transition */
+  transition-property: y, height, fill;
+  transition-duration: 0.6s;
+  transition-timing-function: ease;
+}
+
+.barchart__x-axis {
+  text-anchor: end;
+  stroke-width: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.barchart__x-axis .tick line {
+  stroke: none;
+}
+
+.barchart__y-axis {
+  stroke-width: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.barchart__y-axis-grid-lines line {
+  stroke: #0000008f;
+  stroke-dasharray: 1, 2;
+}

@@ -26,7 +26,7 @@ const D3Chart = ({
 			>
 				<svg
 					ref={chartRef}
-					viewBox="0 0 460 400"
+					viewBox="0 0 500 400"
 					preserveAspectRatio="xMidYMid meet"
 					style={{
 						width: isTall ? "100%" : "auto",

@@ -1,4 +1,5 @@
 import "./App.css";
+import "./fonts.css";
 import Home from "./views/Home";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./components/auth/LoginButton";
