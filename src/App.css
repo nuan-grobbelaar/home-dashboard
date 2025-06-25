@@ -120,9 +120,11 @@
   align-items: center;
 }
 
-.barchart__bar {
+.chart-container {}
+
+.chart__barchart__bar {
   stroke: black;
-  stroke-width: 1.5px;
+  stroke-width: 2px;
   transition: y 0.6s ease, height 0.6s ease;
   /* optionally fill transition */
   transition-property: y, height, fill;
@@ -130,22 +132,34 @@
   transition-timing-function: ease;
 }
 
-.barchart__x-axis {
+.chart__x-axis {
   text-anchor: end;
   stroke-width: 2px;
   font-family: 'Bebas Neue', sans-serif;
+  font-size: 1em;
 }
 
-.barchart__x-axis .tick line {
+.chart__x-axis__label {
+  font-size: 0.9em;
+  fill: #000;
+}
+
+.chart__y-axis__label {
+  font-size: 0.9em;
+  fill: #000;
+}
+
+.chart__x-axis .tick line {
   stroke: none;
 }
 
-.barchart__y-axis {
+.chart__y-axis {
   stroke-width: 2px;
   font-family: 'Bebas Neue', sans-serif;
+  font-size: 1em;
 }
 
-.barchart__y-axis-grid-lines line {
+.chart__grid-lines line {
   stroke: #0000008f;
   stroke-dasharray: 1, 2;
 }
