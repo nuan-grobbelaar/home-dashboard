@@ -1,28 +1,26 @@
 import { useEffect, useState, type PropsWithChildren } from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
-import type { GridItem, GridItemPosition } from "../../hooks/useGridItemPlacer";
+import type { GridItem } from "../../hooks/useGridItemPlacer";
 import Grid from "./Grid";
 import WidgetComponent from "./WidgetComponent";
 import Barchart from "../graphs/Barchart";
+import type { DocumentReference } from "firebase/firestore";
+import {
+	useWidgetStore,
+	widgetComponentRegistry,
+} from "../../hooks/useWidgetStore";
+import type { WidgetData } from "../../hooks/useWidgetGridStore";
 
-export interface WidgetData {
-	id?: any;
-	type?: string;
-	position: GridItemPosition;
-}
-
-export interface WidgetProps extends GridItem, PropsWithChildren {
-	id?: any;
-	type?: string;
-	columns?: number; //TODO: why do these have to be generic?
-	rows?: number;
-}
+export interface WidgetProps extends WidgetData, GridItem, PropsWithChildren {}
 
 export const getWidgetId = (props: WidgetProps) => {
 	return `${props.type}-${props.position.colStart}-${props.position.rowStart}-${props.position.colEnd}-${props.position.rowEnd}`;
 };
 
 const Widget = (props: WidgetProps) => {
+	const { widgetComponentLayout, widgetData } = useWidgetStore(props);
+	console.log("layout", widgetComponentLayout);
+
 	const [data, setData] = useState([
 		{ title: "jan", value: 10000, color: "#B7DDE9" },
 		{ title: "feb", value: 9500, color: "#D6C9E5" },
@@ -64,18 +62,16 @@ const Widget = (props: WidgetProps) => {
 			data-unsaved={props.unsaved}
 			style={{
 				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
-				gridTemplateColumns: `repeat(${props.columns}, 1fr)`,
-				gridTemplateRows: `repeat(${props.rows}, 1fr)`,
 			}}
 		>
-			{(props.unsaved || props.editMode) && (
+			{/* {(props.unsaved || props.editMode) && (
 				<button
 					className="close-button"
 					onClick={() => props.removeItem?.(props.id) ?? undefined}
 				>
 					x
 				</button>
-			)}
+			)} */}
 
 			{props.isLoading ? (
 				"Loading"
@@ -92,19 +88,23 @@ const Widget = (props: WidgetProps) => {
 					]}
 					onSelect={(type: string) => props.onSave?.({ ...props, type: type })}
 				/>
-			) : props.columns && props.rows ? (
+			) : widgetComponentLayout?.columns && widgetComponentLayout?.rows ? (
 				<Grid
 					ItemComponent={WidgetComponent}
-					columns={props.columns}
-					rows={props.rows}
+					columns={widgetComponentLayout?.columns}
+					rows={widgetComponentLayout?.rows}
 					onSaveGridItem={(item: GridItem) => {}}
 					placerMode="NONE"
 				>
-					<WidgetComponent
-						position={{ rowStart: 1, rowEnd: 5, colStart: 1, colEnd: 5 }}
-					>
-						<Barchart data={data} />
-					</WidgetComponent>
+					{widgetComponentLayout.components.map((component) => {
+						const Component = widgetComponentRegistry[component.type];
+
+						return (
+							<WidgetComponent position={component.position}>
+								{<Component data={widgetData} yAxisTitle="Amount Spent" />}
+							</WidgetComponent>
+						);
+					})}
 				</Grid>
 			) : null}
 		</div>

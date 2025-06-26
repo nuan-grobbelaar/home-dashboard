@@ -26,36 +26,39 @@ export interface CartesianGraphComponentProps {
 	yScaleBand?: d3.ScaleLinear<number, number, never>;
 }
 
-export interface GraphProps extends PropsWithChildren {
-	data: GraphData[];
+export interface Margins {
+	top?: number;
+	right?: number;
+	bottom?: number;
+	left?: number;
 }
 
-const Graph = (props: GraphProps) => {
+export interface GraphProps extends PropsWithChildren {
+	data: GraphData[];
+	margins?: Margins;
+}
+
+const Graph = ({ data, children, margins = {} }: GraphProps) => {
 	const svgRef = useRef<SVGSVGElement>(null);
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [isTall, setIsTall] = useState(false);
 	const [modifiedChildren, setModifiedChildren] = useState<ReactElement[]>([]);
 
-	const margin = { top: 30, right: 30, bottom: 60, left: 60 },
-		width = 500 - margin.left - margin.right,
-		height = 400 - margin.top - margin.bottom;
-
-	useEffect(() => {
-		if (containerRef.current) {
-			setIsTall(
-				containerRef.current.clientHeight > containerRef.current.clientWidth
-			);
-		}
-	}, [containerRef]);
+	const margin = {
+		top: 30 + (margins.top ? margins.top : 0),
+		right: 30 + (margins.right ? margins.right : 0),
+		bottom: 50 + (margins.bottom ? margins.bottom : 0),
+		left: 50 + (margins.left ? margins.left : 0),
+	};
+	const width = 500 - margin.left - margin.right;
+	const height = 400 - margin.top - margin.bottom;
 
 	useEffect(() => {
 		const xScaleBand = d3
 			.scaleBand()
 			.range([0, width])
-			.domain(props.data.map((d) => d.title))
+			.domain(data.map((d) => d.title))
 			.padding(0.2);
 
-		const yAxisMax = Math.max(...props.data.map((d) => +d.value!)) * 1.05;
+		const yAxisMax = Math.max(...data.map((d) => +d.value!)) * 1.05;
 		const yScaleBand = d3
 			.scaleLinear()
 			.domain([0, yAxisMax])
@@ -63,16 +66,14 @@ const Graph = (props: GraphProps) => {
 			.range([height, 0]);
 		console.log("graph update", "setting x", xScaleBand);
 
-		const childrenArray = React.Children.toArray(
-			props.children
-		) as ReactElement[];
+		const childrenArray = React.Children.toArray(children) as ReactElement[];
 
-		const children = childrenArray.map((child: ReactElement) => {
+		const modChildren = childrenArray.map((child: ReactElement) => {
 			const newProps: Record<string, any> = {};
 			if (isValidElement(child)) {
 				newProps["xScaleBand"] = xScaleBand;
 				newProps["yScaleBand"] = yScaleBand;
-				newProps["data"] = props.data;
+				newProps["data"] = data;
 				newProps["height"] = height;
 				newProps["width"] = width;
 			}
@@ -80,35 +81,23 @@ const Graph = (props: GraphProps) => {
 			return cloneElement(child as React.ReactElement<any>, newProps);
 		});
 
-		setModifiedChildren(children);
-	}, [props.children, width, height]);
+		setModifiedChildren(modChildren);
+	}, [children, width, height]);
 
 	return (
-		<div className="chart" ref={containerRef}>
-			<div
-				style={{
-					width: isTall ? "100%" : "auto",
-					height: isTall ? "auto" : "100%",
-				}}
+		<svg
+			ref={svgRef}
+			className="chart"
+			viewBox={`0 0 ${500} ${425}`}
+			preserveAspectRatio="xMidYMid meet"
+		>
+			<g
+				className="chart-container"
+				transform={`translate(${margin.left},${margin.top})`}
 			>
-				<svg
-					ref={svgRef}
-					viewBox={`0 0 ${500} ${425}`}
-					preserveAspectRatio="xMidYMid meet"
-					style={{
-						width: isTall ? "100%" : "auto",
-						height: isTall ? "auto" : "100%",
-					}}
-				>
-					<g
-						className="chart-container"
-						transform={`translate(${margin.left},${margin.top})`}
-					>
-						{modifiedChildren}
-					</g>
-				</svg>
-			</div>
-		</div>
+				{modifiedChildren}
+			</g>
+		</svg>
 	);
 };
 

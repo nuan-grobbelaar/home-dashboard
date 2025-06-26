@@ -8,11 +8,33 @@ import {
 	writeBatch,
 	doc,
 	deleteDoc,
+	DocumentReference,
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
-import type { Layout } from "../views/Home";
-import type { WidgetData } from "../components/widget/Widget";
+import type { GridItemPosition } from "./useGridItemPlacer";
+
+// The layout of widgets inside the widget grid
+export interface WidgetLayoutData {
+	id?: any;
+	rows: number;
+	columns: number;
+	widgets: Array<WidgetData>;
+}
+
+export interface WidgetData {
+	id?: any;
+	dbRef?: DocumentReference;
+	type?: string;
+	componentLayoutRef?: DocumentReference;
+	position: GridItemPosition;
+	datasource?: DocumentReference;
+	datasourceQuery?: {
+		collection: string;
+		groupBy: string;
+		target: string;
+	};
+}
 
 export function useWidgetGridStore(
 	setLoading: (isLoading: boolean) => void,
@@ -21,13 +43,16 @@ export function useWidgetGridStore(
 	const db = getFirestore();
 
 	// const [layouts, setLayouts] = useState<Layout[]>([]);
-	const [activeLayout, setActiveLayout] = useState<Layout | null>(null);
+	const [activeLayout, setActiveLayout] = useState<WidgetLayoutData | null>(
+		null
+	);
 
 	useEffect(() => {
 		loadActiveLayout();
+		console.log("useWidgetGridStore", "layout", activeLayout);
 	}, []);
 
-	async function getLayoutWidgets(layoutId: any) {
+	async function getWidgets(layoutId: string) {
 		const user = auth.currentUser;
 		if (!user) return Promise.reject(new Error("Not authenticated"));
 
@@ -41,9 +66,23 @@ export function useWidgetGridStore(
 		);
 
 		const querySnapshot = await getDocs(layoutWidgetsRef);
+
 		if (!querySnapshot.empty) {
 			return querySnapshot.docs.map(
-				(doc) => ({ id: doc.id, ...doc.data() } as WidgetData)
+				(d) =>
+					({
+						id: d.id,
+						dbRef: doc(
+							db,
+							"users",
+							user.uid,
+							"widget-layouts",
+							layoutId,
+							"widgets",
+							d.id
+						),
+						...d.data(),
+					} as WidgetData)
 			);
 		} else {
 			console.log("No widgets found in layout.");
@@ -72,12 +111,12 @@ export function useWidgetGridStore(
 				const doc = querySnapshot.docs[0];
 				const layoutId = doc.id;
 
-				getLayoutWidgets(layoutId).then((widgets) => {
+				getWidgets(layoutId).then((widgets) => {
 					setActiveLayout({
 						id: doc.id,
 						widgets,
 						...doc.data(),
-					} as Layout);
+					} as WidgetLayoutData);
 				});
 			})
 			.catch((err) => {
@@ -137,7 +176,7 @@ export function useWidgetGridStore(
 			});
 	}
 
-	function saveLayout(layout: Layout) {
+	function saveLayout(layout: WidgetLayoutData) {
 		const user = auth.currentUser;
 		if (!user) throw new Error("Not authenticated");
 
@@ -171,5 +210,10 @@ export function useWidgetGridStore(
 			});
 	}
 
-	return { activeLayout, saveWidget, deleteWidget, saveLayout };
+	return {
+		activeLayout,
+		saveWidget,
+		deleteWidget,
+		saveLayout,
+	};
 }

@@ -7,7 +7,9 @@ import type {
 
 export interface XAxisScaling
 	extends GraphComponentProps,
-		CartesianGraphComponentProps {}
+		CartesianGraphComponentProps {
+	label?: string;
+}
 
 const XAxisScaling = (props: XAxisScaling) => {
 	const gRef = useRef<SVGGElement>(null);
@@ -24,11 +26,13 @@ const XAxisScaling = (props: XAxisScaling) => {
 				.attr("text-anchor", "end")
 				.attr("transform", "translate(-15,10)rotate(-90)");
 
-			g.append("text")
-				.attr("text-anchor", "middle")
-				.attr("transform", `translate(${props.width! / 2},60)`)
-				.classed("chart__x-axis__label", true)
-				.text("income per capita, inflation-adjusted (dollars)");
+			if (props.label) {
+				g.append("text")
+					.attr("text-anchor", "middle")
+					.attr("transform", `translate(${props.width! / 2},60)`)
+					.classed("chart__x-axis__label", true)
+					.text(props.label);
+			}
 		}
 	}, [props.data, props.xScaleBand]);
 

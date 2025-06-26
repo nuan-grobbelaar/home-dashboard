@@ -7,7 +7,9 @@ import type {
 
 export interface AxisYProps
 	extends GraphComponentProps,
-		CartesianGraphComponentProps {}
+		CartesianGraphComponentProps {
+	label?: string;
+}
 
 const YAxisLinear = (props: AxisYProps) => {
 	const gRef = useRef<SVGGElement>(null);
@@ -24,11 +26,13 @@ const YAxisLinear = (props: AxisYProps) => {
 
 			g.call(d3.axisLeft(props.yScaleBand));
 
-			g.append("text")
-				.attr("text-anchor", "middle")
-				.attr("transform", `translate(-50,${+props.height! / 2})rotate(-90)`)
-				.classed("chart__y-axis__label", true)
-				.text("income per capita, inflation-adjusted (dollars)");
+			if (props.label) {
+				g.append("text")
+					.attr("text-anchor", "middle")
+					.attr("transform", `translate(-60,${+props.height! / 2})rotate(-90)`)
+					.classed("chart__y-axis__label", true)
+					.text(props.label);
+			}
 		}
 	}, [props.yScaleBand]);
 

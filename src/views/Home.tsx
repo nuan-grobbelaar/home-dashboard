@@ -1,19 +1,15 @@
 import Grid from "../components/widget/Grid";
 import Widget, {
 	getWidgetId,
-	type WidgetData,
 	type WidgetProps,
 } from "../components/widget/Widget";
 import { useState } from "react";
-import { useWidgetGridStore } from "../hooks/useWidgetGridStore";
+import {
+	useWidgetGridStore,
+	type WidgetData,
+} from "../hooks/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
-
-export interface Layout {
-	id?: any;
-	rows: number;
-	columns: number;
-	widgets: Array<WidgetData>;
-}
+import { doc } from "firebase/firestore";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
@@ -54,7 +50,7 @@ const Home = () => {
 						});
 					}}
 				>
-					{activeLayout.widgets.map((widget: WidgetProps) => (
+					{activeLayout.widgets.map((widget: WidgetData) => (
 						<Widget
 							key={getWidgetId(widget)}
 							{...widget}
@@ -62,8 +58,7 @@ const Home = () => {
 								id ? deleteWidget(activeLayout.id, id) : null
 							}
 							editMode={true}
-							rows={4}
-							columns={4}
+							dbRef={widget.dbRef}
 						>
 							{widget.type}
 						</Widget>
