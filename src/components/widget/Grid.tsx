@@ -108,11 +108,11 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 	const fillers = [];
 	console.log(occupiedPositions);
 
-	for (let c = 1; c <= props.columns; c++) {
-		for (let r = 1; r <= props.rows; r++) {
+	for (let c = 1; c <= props.rows; c++) {
+		for (let r = 1; r <= props.columns; r++) {
 			console.log("OCCUPIEDD", occupiedPositions);
 			const isOccupied = occupiedPositions.some(
-				([col, row]) => row == r && col == c
+				([row, col]) => row == r && col == c
 			);
 			if (!isOccupied) {
 				console.log("OCCUPIEDD", "PUSH");
