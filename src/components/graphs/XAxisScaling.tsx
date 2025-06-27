@@ -29,7 +29,7 @@ const XAxisScaling = (props: XAxisScaling) => {
 			if (props.label) {
 				g.append("text")
 					.attr("text-anchor", "middle")
-					.attr("transform", `translate(${props.width! / 2},60)`)
+					.attr("transform", `translate(${props.width! / 2},60)`) //TODO: the needs to translate down to account for x ticks
 					.classed("chart__x-axis__label", true)
 					.text(props.label);
 			}

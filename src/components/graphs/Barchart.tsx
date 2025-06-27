@@ -7,8 +7,8 @@ import Bars from "./Bars";
 
 export interface BarchartProps {
 	data: GraphData[];
-	xAxisTitle?: string;
-	yAxisTitle?: string;
+	xAxisLabel?: string;
+	yAxisLabel?: string;
 }
 
 const Barchart = (props: BarchartProps) => {
@@ -16,12 +16,12 @@ const Barchart = (props: BarchartProps) => {
 		<Graph
 			data={props.data}
 			margins={{
-				left: props.yAxisTitle ? 20 : 0,
-				bottom: props.xAxisTitle ? 20 : 0,
+				left: props.yAxisLabel ? 20 : 0,
+				bottom: props.xAxisLabel ? 20 : 0,
 			}}
 		>
-			<XAxisScaling label={props.xAxisTitle} />
-			<YAxisLinear label={props.yAxisTitle} />
+			<XAxisScaling label={props.xAxisLabel} />
+			<YAxisLinear label={props.yAxisLabel} />
 			<GridLines />
 			<Bars />
 		</Graph>

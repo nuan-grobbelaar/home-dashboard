@@ -3,6 +3,7 @@ import {
 	getDocs,
 	DocumentReference,
 	getDoc,
+	getFirestore,
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
@@ -51,6 +52,8 @@ export function useWidgetStore(
 			[key: string]: string | number;
 		}>
 	>();
+
+	const db = getFirestore();
 
 	useEffect(() => {
 		loadWidgetComponentLayout();

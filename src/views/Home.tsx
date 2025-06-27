@@ -10,6 +10,7 @@ import {
 } from "../hooks/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { doc } from "firebase/firestore";
+import { useWidgetDefinitionStore } from "../hooks/useWidgetDefinitionStore";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
@@ -25,6 +26,8 @@ const Home = () => {
 		setLoadingLayouts,
 		setLayoutsError
 	);
+	const { widgetDefinitions } = useWidgetDefinitionStore();
+	console.log("DEFS", widgetDefinitions);
 
 	if (isFirebaseAuthLoading || loadingLayouts) {
 		return <div>Loading...</div>;

@@ -100,8 +100,8 @@ const Widget = (props: WidgetProps) => {
 						const Component = widgetComponentRegistry[component.type];
 
 						return (
-							<WidgetComponent position={component.position}>
-								{<Component data={widgetData} yAxisTitle="Amount Spent" />}
+							<WidgetComponent key={component.id} position={component.position}>
+								{<Component data={widgetData} {...component.props} />}
 							</WidgetComponent>
 						);
 					})}
