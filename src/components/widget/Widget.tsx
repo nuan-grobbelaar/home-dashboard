@@ -55,7 +55,7 @@ const Widget = (props: WidgetProps) => {
 					ItemComponent={WidgetComponent}
 					columns={widgetComponentLayout?.columns}
 					rows={widgetComponentLayout?.rows}
-					onSaveGridItem={(item: GridItem) => {}}
+					onSaveGridItem={() => {}}
 					placerMode="NONE"
 				>
 					{widgetComponentLayout.components.map((component) => {

@@ -25,8 +25,7 @@ const Bars = (props: BarsProps) => {
 		) {
 			console.log("graph update", "xScaleBand:", props.xScaleBand);
 			console.log("graph update", "yScaleBand:", props.yScaleBand);
-			const g = d3
-				.select(gRef.current)
+			d3.select(gRef.current)
 				.selectAll<SVGRectElement, GraphData>("rect")
 				.data(props.data, (d) => d.title)
 				.join(

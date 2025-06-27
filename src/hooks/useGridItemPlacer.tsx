@@ -57,7 +57,7 @@ export function useGridItemPlacer<T extends GridItem>(
 		setPlacedItem(item);
 	};
 
-	const removePlacedItem = (id?: string) => {
+	const removePlacedItem = () => {
 		setPlacedItem(null);
 	};
 

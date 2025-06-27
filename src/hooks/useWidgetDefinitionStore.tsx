@@ -2,7 +2,6 @@ import {
 	collection,
 	getDocs,
 	DocumentReference,
-	getDoc,
 	getFirestore,
 } from "firebase/firestore";
 import { auth } from "../firebase";
@@ -39,8 +38,8 @@ export interface WidgetDefinition {
 
 export function useWidgetDefinitionStore(
 	auto: boolean = true,
-	setLoading?: (isLoading: boolean) => void,
-	setError?: (error: String | null) => void
+	setLoading?: (isLoading: boolean) => void
+	// setError?: (error: String | null) => void
 ) {
 	const db = getFirestore();
 

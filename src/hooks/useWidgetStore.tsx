@@ -3,7 +3,6 @@ import {
 	getDocs,
 	DocumentReference,
 	getDoc,
-	getFirestore,
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
@@ -42,8 +41,8 @@ export interface WidgetComponentLayout {
 
 export function useWidgetStore(
 	widget: WidgetData,
-	setLoading?: (isLoading: boolean) => void,
-	setError?: (error: String | null) => void
+	setLoading?: (isLoading: boolean) => void
+	// setError?: (error: String | null) => void
 ) {
 	const [widgetComponentLayout, setWidgetComponentLayout] =
 		useState<WidgetComponentLayout>();
@@ -53,9 +52,8 @@ export function useWidgetStore(
 		}>
 	>();
 
-	const db = getFirestore();
-
 	useEffect(() => {
+		setLoading?.(false);
 		loadWidgetComponentLayout();
 		queryWidgetDatasource();
 

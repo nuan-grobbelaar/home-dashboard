@@ -1,8 +1,5 @@
 import Grid from "../components/widget/Grid";
-import Widget, {
-	getWidgetId,
-	type WidgetProps,
-} from "../components/widget/Widget";
+import Widget, { getWidgetId } from "../components/widget/Widget";
 import { useState } from "react";
 import {
 	useWidgetGridStore,
@@ -10,20 +7,15 @@ import {
 	type WidgetData,
 } from "../hooks/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
-import { doc } from "firebase/firestore";
-import {
-	useWidgetDefinitionStore,
-	type WidgetComponentLayoutDefinition,
-} from "../hooks/useWidgetDefinitionStore";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
 	const [layoutsError, setLayoutsError] = useState<String | null>(null);
 
 	const {
-		user: firebaseUser,
+		// user: firebaseUser,
 		loading: isFirebaseAuthLoading,
-		error: firebaseAuthError,
+		// error: firebaseAuthError,
 	} = useFirebaseAuth();
 
 	const { activeLayout, saveWidget, deleteWidget } = useWidgetGridStore(
