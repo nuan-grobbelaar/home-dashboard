@@ -106,7 +106,7 @@ export function useWidgetStore(
 						});
 					} else {
 						console.error(
-							`No component layout found with ref: ${componentLayoutRef}`
+							`No component layout found with ref: ${componentLayoutRef.path}`
 						);
 					}
 				});

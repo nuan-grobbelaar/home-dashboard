@@ -12,7 +12,8 @@ import {
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
-import type { GridItemPosition } from "./useGridItemPlacer";
+import type { GridItem, GridItemPosition } from "./useGridItemPlacer";
+import type { WidgetComponentLayoutDefinition } from "./useWidgetDefinitionStore";
 
 // The layout of widgets inside the widget grid
 export interface WidgetLayoutData {
@@ -35,6 +36,11 @@ export interface WidgetData {
 		target: string;
 	};
 }
+
+export type WidgetCreationData = WidgetComponentLayoutDefinition &
+	GridItem & {
+		type: string;
+	};
 
 export function useWidgetGridStore(
 	setLoading: (isLoading: boolean) => void,
@@ -128,23 +134,31 @@ export function useWidgetGridStore(
 			});
 	}
 
-	function saveWidget(layoutId: string, widget: WidgetData) {
+	function saveWidget(layoutId: string, widget: WidgetCreationData) {
 		const user = auth.currentUser;
 		if (!user) throw new Error("Not authenticated");
 
-		const widgetId = widget.id || crypto.randomUUID();
-
 		const widgetRef = doc(
-			db,
-			"users",
-			user.uid,
-			"widget-layouts",
-			layoutId,
-			"widgets",
-			widgetId
+			collection(db, "users", user.uid, "widget-layouts", layoutId, "widgets")
 		);
 
-		const { id, ...widgetData } = widget;
+		const { id, ...data } = widget;
+
+		const widgetData: WidgetData = {
+			componentLayoutRef: doc(
+				db,
+				"widgets",
+				data.type,
+				"component-layouts",
+				id
+			),
+			type: data.type,
+			datasource: doc(db, "users", user.uid, "apps", data.datasourceApp),
+			datasourceQuery: data.datasourceQuery,
+			position: data.position,
+		};
+
+		console.log("saving", id);
 
 		setDoc(widgetRef, widgetData, { merge: true })
 			.then(() => loadActiveLayout(true))

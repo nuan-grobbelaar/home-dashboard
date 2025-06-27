@@ -23,6 +23,12 @@ export interface WidgetComponentLayoutDefinition {
 	name: string;
 	rows: number;
 	columns: number;
+	datasourceApp: string;
+	datasourceQuery: {
+		collection: string;
+		groupBy: string;
+		target: string;
+	};
 	widgetComponentDefinitions: WidgetComponentDefinition[];
 }
 
@@ -32,6 +38,7 @@ export interface WidgetDefinition {
 }
 
 export function useWidgetDefinitionStore(
+	auto: boolean = true,
 	setLoading?: (isLoading: boolean) => void,
 	setError?: (error: String | null) => void
 ) {
@@ -42,7 +49,7 @@ export function useWidgetDefinitionStore(
 	>([]);
 
 	useEffect(() => {
-		getWidgetDefinitions().then((wd) => (wd ? setWidgetDefinitions(wd) : null));
+		if (auto) loadWidgetDefinitions();
 	}, []);
 
 	async function getWidgetComponentLayoutDefinitions(
@@ -117,5 +124,12 @@ export function useWidgetDefinitionStore(
 		}
 	}
 
-	return { widgetDefinitions };
+	function loadWidgetDefinitions() {
+		setLoading?.(true);
+		getWidgetDefinitions()
+			.then((wd) => (wd ? setWidgetDefinitions(wd) : null))
+			.finally(() => setLoading?.(false));
+	}
+
+	return { loadWidgetDefinitions, widgetDefinitions };
 }

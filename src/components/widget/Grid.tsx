@@ -11,7 +11,7 @@ interface GridProps<P extends GridItem> extends PropsWithChildren {
 	columns: number;
 	rows: number;
 	placerMode?: PlacerMode;
-	onSaveGridItem: (item: GridItem) => void;
+	onSaveGridItem: (item: P) => void;
 
 	ItemComponent: React.ComponentType<P>;
 }
@@ -38,7 +38,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 		removePlacedItem();
 	}, [props.children]);
 
-	const onSaveGridItem = (item: GridItem) => {
+	const onSaveGridItem = (item: P) => {
 		props.onSaveGridItem
 			? props.onSaveGridItem(item)
 			: console.error("onSaveGridItem is udnefined");
@@ -108,12 +108,14 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 	const fillers = [];
 	console.log(occupiedPositions);
 
-	for (let c = 1; c <= props.rows; c++) {
-		for (let r = 1; r <= props.columns; r++) {
+	for (let c = 1; c <= props.columns; c++) {
+		for (let r = 1; r <= props.rows; r++) {
+			console.log("OCCUPIEDD", occupiedPositions);
 			const isOccupied = occupiedPositions.some(
-				([row, col]) => row === r && col === c
+				([col, row]) => row == r && col == c
 			);
 			if (!isOccupied) {
+				console.log("OCCUPIEDD", "PUSH");
 				fillers.push(
 					<Filler
 						key={`widget-filler-${r}-${c}`}

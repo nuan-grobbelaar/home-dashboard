@@ -66,9 +66,18 @@
 
 .widget__widget-type-select {
   border: 1.5px solid black;
+  font-family: 'Bebas Neue', sans-serif;
+
   padding: 8px;
-  max-width: 50%;
-  max-height: 50%;
+  max-width: 75%;
+  max-height: 75%;
+  width: 75%;
+  height: 75%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   overflow-y: auto;
   overflow-x: hidden;

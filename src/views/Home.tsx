@@ -6,11 +6,15 @@ import Widget, {
 import { useState } from "react";
 import {
 	useWidgetGridStore,
+	type WidgetCreationData,
 	type WidgetData,
 } from "../hooks/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
 import { doc } from "firebase/firestore";
-import { useWidgetDefinitionStore } from "../hooks/useWidgetDefinitionStore";
+import {
+	useWidgetDefinitionStore,
+	type WidgetComponentLayoutDefinition,
+} from "../hooks/useWidgetDefinitionStore";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
@@ -26,8 +30,6 @@ const Home = () => {
 		setLoadingLayouts,
 		setLayoutsError
 	);
-	const { widgetDefinitions } = useWidgetDefinitionStore();
-	console.log("DEFS", widgetDefinitions);
 
 	if (isFirebaseAuthLoading || loadingLayouts) {
 		return <div>Loading...</div>;
@@ -45,12 +47,8 @@ const Home = () => {
 					ItemComponent={Widget}
 					columns={activeLayout.columns}
 					rows={activeLayout.rows}
-					onSaveGridItem={(item: WidgetProps) => {
-						saveWidget(activeLayout.id, {
-							id: item.id,
-							position: item.position,
-							type: item.type,
-						});
+					onSaveGridItem={(item: WidgetCreationData) => {
+						saveWidget(activeLayout.id, item);
 					}}
 				>
 					{activeLayout.widgets.map((widget: WidgetData) => (
