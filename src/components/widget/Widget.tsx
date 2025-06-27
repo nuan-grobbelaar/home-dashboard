@@ -1,4 +1,10 @@
-import { useMemo, useState, type PropsWithChildren } from "react";
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type PropsWithChildren,
+} from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
 import type { GridItem } from "../../hooks/useGridItemPlacer";
 import Grid from "./Grid";
@@ -8,23 +14,43 @@ import {
 	widgetComponentRegistry,
 } from "../../hooks/useWidgetStore";
 import type { WidgetData } from "../../hooks/useWidgetGridStore";
+import { useWidgetDefinitionStore } from "../../hooks/useWidgetDefinitionStore";
+import LoadingBar from "./LoadingBar";
 
 export interface WidgetProps extends WidgetData, GridItem, PropsWithChildren {}
+
+export interface WidgetLoading {
+	isLoading: boolean;
+	message?: string;
+}
 
 export const getWidgetId = (props: WidgetProps) => {
 	return `${props.type}-${props.position.colStart}-${props.position.rowStart}-${props.position.colEnd}-${props.position.rowEnd}`;
 };
 
 const Widget = (props: WidgetProps) => {
-	const [_isLoading, setIsLoading] = useState(false);
+	const [loading, setLoading] = useState<WidgetLoading>({
+		isLoading: !!props.isLoading,
+	});
 	const isLoading = useMemo(
-		() => _isLoading || props.isLoading,
-		[_isLoading, props.isLoading]
+		() => loading.isLoading || props.isLoading,
+		[loading, props.isLoading]
 	);
 	const { widgetComponentLayout, widgetData } = useWidgetStore(
 		props,
-		setIsLoading
+		setLoading
 	);
+
+	const { loadWidgetDefinitions, widgetDefinitions } = useWidgetDefinitionStore(
+		false,
+		setLoading
+	);
+
+	useEffect(() => {
+		if (props.unsaved && props.onSave) {
+			loadWidgetDefinitions();
+		}
+	}, []);
 
 	return (
 		<div
@@ -44,9 +70,15 @@ const Widget = (props: WidgetProps) => {
 			)}
 
 			{isLoading ? (
-				"Loading"
-			) : props.unsaved && props.onSave && !isLoading ? (
+				<div className="widget__loading">
+					<LoadingBar message={loading.message} />
+				</div>
+			) : props.unsaved &&
+			  props.onSave &&
+			  widgetDefinitions &&
+			  widgetDefinitions.length > 0 ? (
 				<WidgetTypeSelect
+					widgetDefinitions={widgetDefinitions}
 					widgetPosition={props.position}
 					onSave={props.onSave}
 				/>

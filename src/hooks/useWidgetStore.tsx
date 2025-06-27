@@ -8,6 +8,7 @@ import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import Barchart from "../components/graphs/Barchart";
 import type { WidgetData } from "./useWidgetGridStore";
+import type { WidgetLoading } from "../components/widget/Widget";
 
 export type ComponentName = "barchart" | "linegraph";
 
@@ -41,7 +42,7 @@ export interface WidgetComponentLayout {
 
 export function useWidgetStore(
 	widget: WidgetData,
-	setLoading?: (isLoading: boolean) => void
+	setLoading?: (loading: WidgetLoading) => void
 	// setError?: (error: String | null) => void
 ) {
 	const [widgetComponentLayout, setWidgetComponentLayout] =
@@ -53,7 +54,7 @@ export function useWidgetStore(
 	>();
 
 	useEffect(() => {
-		setLoading?.(false);
+		setLoading?.({ isLoading: false });
 		loadWidgetComponentLayout();
 		queryWidgetDatasource();
 

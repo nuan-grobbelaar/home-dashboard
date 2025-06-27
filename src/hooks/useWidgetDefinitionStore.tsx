@@ -7,6 +7,7 @@ import {
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import type { GridItemPosition } from "./useGridItemPlacer";
+import type { WidgetLoading } from "../components/widget/Widget";
 
 export interface WidgetComponentDefinition {
 	id: string;
@@ -38,7 +39,7 @@ export interface WidgetDefinition {
 
 export function useWidgetDefinitionStore(
 	auto: boolean = true,
-	setLoading?: (isLoading: boolean) => void
+	setLoading?: (loading: WidgetLoading) => void
 	// setError?: (error: String | null) => void
 ) {
 	const db = getFirestore();
@@ -124,10 +125,10 @@ export function useWidgetDefinitionStore(
 	}
 
 	function loadWidgetDefinitions() {
-		setLoading?.(true);
+		setLoading?.({ isLoading: true, message: "Loading widget definitions" });
 		getWidgetDefinitions()
 			.then((wd) => (wd ? setWidgetDefinitions(wd) : null))
-			.finally(() => setLoading?.(false));
+			.finally(() => setLoading?.({ isLoading: false }));
 	}
 
 	return { loadWidgetDefinitions, widgetDefinitions };
