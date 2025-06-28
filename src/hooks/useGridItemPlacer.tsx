@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FillerProps } from "../components/widget/Filler";
+import type { WidgetLoading } from "../components/widget/Widget";
 
 export interface GridItemPosition {
 	colStart: number;
@@ -11,7 +12,7 @@ export interface GridItemPosition {
 export interface GridItem {
 	position: GridItemPosition;
 	unsaved?: boolean;
-	isLoading?: boolean;
+	isLoading?: WidgetLoading;
 	editMode?: boolean;
 	onSave?: (item: any) => void;
 	removeItem?: (id?: string) => void;
@@ -62,7 +63,12 @@ export function useGridItemPlacer<T extends GridItem>(
 	};
 
 	const setPlacedItemToLoading = () => {
-		if (placedGridItem) setPlacedItem({ ...placedGridItem, isLoading: true });
+		if (placedGridItem) {
+			setPlacedItem({
+				...placedGridItem,
+				isLoading: { isLoading: true, message: "Saving widget" },
+			});
+		}
 	};
 
 	const handleMouseDown = (filler: FillerProps, e: React.MouseEvent) => {

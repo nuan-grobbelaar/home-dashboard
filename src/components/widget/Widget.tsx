@@ -1,10 +1,4 @@
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-	type PropsWithChildren,
-} from "react";
+import { useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
 import type { GridItem } from "../../hooks/useGridItemPlacer";
 import Grid from "./Grid";
@@ -32,10 +26,12 @@ const Widget = (props: WidgetProps) => {
 	const [loading, setLoading] = useState<WidgetLoading>({
 		isLoading: !!props.isLoading,
 	});
-	const isLoading = useMemo(
-		() => loading.isLoading || props.isLoading,
-		[loading, props.isLoading]
-	);
+	const isLoading = useMemo(() => {
+		if (props.isLoading?.isLoading && props.isLoading?.message)
+			return { isLoading: true, message: props.isLoading?.message };
+		else return loading;
+	}, [loading, props.isLoading]);
+
 	const { widgetComponentLayout, widgetData } = useWidgetStore(
 		props,
 		setLoading
@@ -47,7 +43,11 @@ const Widget = (props: WidgetProps) => {
 	);
 
 	useEffect(() => {
-		if (props.unsaved && props.onSave) {
+		if (
+			props.unsaved &&
+			props.onSave &&
+			(!widgetDefinitions || widgetDefinitions.length === 0)
+		) {
 			loadWidgetDefinitions();
 		}
 	}, []);
@@ -69,9 +69,9 @@ const Widget = (props: WidgetProps) => {
 				</button>
 			)}
 
-			{isLoading ? (
+			{isLoading.isLoading ? (
 				<div className="widget__loading">
-					<LoadingBar message={loading.message} />
+					<LoadingBar message={isLoading.message} />
 				</div>
 			) : props.unsaved &&
 			  props.onSave &&

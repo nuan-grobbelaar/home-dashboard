@@ -54,7 +54,10 @@ export function useWidgetStore(
 	>();
 
 	useEffect(() => {
-		setLoading?.({ isLoading: false });
+		// setLoading?.({
+		// 	isLoading: true,
+		// 	message: "Loading widget component layout",
+		// });
 		loadWidgetComponentLayout();
 		queryWidgetDatasource();
 
