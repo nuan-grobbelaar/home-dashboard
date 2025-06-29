@@ -12,6 +12,7 @@ const WidgetComponent = (props: WidgetComponentProps) => {
 	return (
 		<div
 			data-unsaved={props.unsaved}
+			className="widget-component"
 			style={{
 				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
 			}}

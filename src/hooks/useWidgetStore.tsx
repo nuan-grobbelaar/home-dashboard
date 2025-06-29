@@ -68,54 +68,54 @@ export function useWidgetStore(
 		return () => clearInterval(interval);
 	}, [widget]);
 
-	function loadWidgetComponentLayout() {
+	async function getWidgetComponentLayout(widgetRef: DocumentReference) {
 		const user = auth.currentUser;
 		if (!user) return Promise.reject(new Error("Not authenticated"));
-		if (!widget.dbRef) return Promise.reject();
 
-		getDoc(widget.dbRef).then((widgetSnapshot) => {
-			if (widgetSnapshot.exists()) {
-				console.log("useWidgetStore", widgetSnapshot.data());
-				const componentLayoutRef: DocumentReference<WidgetComponentLayout> =
-					widgetSnapshot.get("componentLayoutRef");
+		const widgetSnapshot = await getDoc(widgetRef);
 
-				getDoc(componentLayoutRef).then((componentLayoutSnapshot) => {
-					if (componentLayoutSnapshot.exists()) {
-						const layout = {
-							id: componentLayoutSnapshot.id,
-							...componentLayoutSnapshot.data(),
-						} as WidgetComponentLayout;
+		if (widgetSnapshot.exists()) {
+			console.log("useWidgetStore", widgetSnapshot.data());
+			const componentLayoutRef: DocumentReference<WidgetComponentLayout> =
+				widgetSnapshot.get("componentLayoutRef");
 
-						const componentCollectionRef = collection(
-							componentLayoutRef,
-							"components"
-						);
+			const componentLayoutSnapshot = await getDoc(componentLayoutRef);
 
-						getDocs(componentCollectionRef).then((componentsSnapshot) => {
-							const components: Array<WidgetComponent> = [];
-							if (!componentsSnapshot.empty) {
-								componentsSnapshot.docs.map((component) =>
-									components.push({
-										id: component.id,
-										...component.data(),
-									} as WidgetComponent)
-								);
-							}
+			if (componentLayoutSnapshot.exists()) {
+				const layout = {
+					id: componentLayoutSnapshot.id,
+					...componentLayoutSnapshot.data(),
+				} as WidgetComponentLayout;
 
-							layout.components = components;
-							console.log("useWidgetStore", "components", components);
-							setWidgetComponentLayout(layout);
-						});
-					} else {
-						console.error(
-							`No component layout found with ref: ${componentLayoutRef.path}`
-						);
-					}
-				});
+				const componentCollectionRef = collection(
+					componentLayoutRef,
+					"components"
+				);
+
+				const componentsSnapshot = await getDocs(componentCollectionRef);
+
+				const components: Array<WidgetComponent> = [];
+				if (!componentsSnapshot.empty) {
+					componentsSnapshot.docs.map((component) =>
+						components.push({
+							id: component.id,
+							...component.data(),
+						} as WidgetComponent)
+					);
+				}
+
+				layout.components = components;
+				console.log("useWidgetStore", "components", components);
+
+				return layout;
 			} else {
-				console.error(`No widgets found with ref: ${widget.dbRef}`);
+				console.error(
+					`No component layout found with ref: ${componentLayoutRef.path}`
+				);
 			}
-		});
+		} else {
+			console.error(`No widgets found with ref: ${widget.dbRef}`);
+		}
 	}
 
 	function queryWidgetDatasource() {
@@ -158,6 +158,17 @@ export function useWidgetStore(
 				setWidgetData(data);
 			}
 		});
+	}
+
+	function loadWidgetComponentLayout() {
+		if (!widget.dbRef) return;
+		setLoading?.({
+			isLoading: true,
+			message: "Loading widget component layout",
+		});
+		getWidgetComponentLayout(widget.dbRef)
+			.then((wcl) => (wcl ? setWidgetComponentLayout(wcl) : null))
+			.finally(() => setLoading?.({ isLoading: false }));
 	}
 
 	return { widgetComponentLayout, widgetData };
