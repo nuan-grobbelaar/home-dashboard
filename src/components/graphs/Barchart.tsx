@@ -4,6 +4,7 @@ import XAxisScaling from "./XAxisScaling";
 import YAxisLinear from "./YAxisLinear";
 import GridLines from "./GridLines";
 import Bars from "./Bars";
+import StackedBars from "./StackedBars";
 
 export interface BarchartProps {
 	data: GraphData[];
@@ -23,7 +24,33 @@ const Barchart = (props: BarchartProps) => {
 			<XAxisScaling label={props.xAxisLabel} />
 			<YAxisLinear label={props.yAxisLabel} />
 			<GridLines />
-			<Bars />
+			{props.data.find(
+				(d) => typeof d.value === "object" && d.value !== null
+			) ? (
+				<StackedBars
+					groupColours={{
+						groceries: "#a8d5ba",
+						rent: "#f7c8c8",
+						pets: "#fce4b5",
+						entertainment: "#cbb4d4",
+						transport: "#bcdffb",
+						utilities: "#f9d6ac",
+						toys: "#b3e3dc",
+					}}
+				/>
+			) : (
+				<Bars
+					groupColours={{
+						groceries: "#a8d5ba",
+						rent: "#f7c8c8",
+						pets: "#fce4b5",
+						entertainment: "#cbb4d4",
+						transport: "#bcdffb",
+						utilities: "#f9d6ac",
+						toys: "#b3e3dc",
+					}}
+				/>
+			)}
 		</Graph>
 	);
 };

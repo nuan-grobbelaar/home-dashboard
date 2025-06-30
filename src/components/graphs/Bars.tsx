@@ -8,7 +8,9 @@ import type {
 
 export interface BarsProps
 	extends GraphComponentProps,
-		CartesianGraphComponentProps {}
+		CartesianGraphComponentProps {
+	groupColours: { [groupName: string]: string };
+}
 
 const Bars = (props: BarsProps) => {
 	const gRef = useRef<SVGGElement>(null);
@@ -23,8 +25,6 @@ const Bars = (props: BarsProps) => {
 			props.xScaleBand &&
 			props.yScaleBand
 		) {
-			console.log("graph update", "xScaleBand:", props.xScaleBand);
-			console.log("graph update", "yScaleBand:", props.yScaleBand);
 			d3.select(gRef.current)
 				.selectAll<SVGRectElement, GraphData>("rect")
 				.data(props.data, (d) => d.title)
@@ -36,7 +36,7 @@ const Bars = (props: BarsProps) => {
 							.attr("width", props.xScaleBand!.bandwidth())
 							.attr("y", () => props.yScaleBand!(0))
 							.attr("height", 0)
-							.attr("fill", (d) => d.color ?? "#fff")
+							.attr("fill", (d) => props.groupColours?.[d.title] ?? "#fff")
 							.classed("chart__barchart__bar", true)
 							.call((sel) => {
 								// Force reflow
@@ -57,8 +57,7 @@ const Bars = (props: BarsProps) => {
 							.attr(
 								"height",
 								(d) => +props.height! - props.yScaleBand!(+d.value!)
-							)
-							.attr("fill", (d) => d.color ?? "#fff"),
+							),
 
 					(exit) => exit.remove()
 				);

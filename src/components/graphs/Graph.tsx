@@ -11,7 +11,7 @@ import React, {
 
 export interface GraphData {
 	title: string;
-	value: string | number;
+	value: string | number | { [key: string]: any };
 	color?: string;
 }
 
@@ -58,7 +58,20 @@ const Graph = ({ data, children, margins = {} }: GraphProps) => {
 			.domain(data.map((d) => d.title))
 			.padding(0.2);
 
-		const yAxisMax = Math.max(...data.map((d) => +d.value!)) * 1.05;
+		const yAxisMax =
+			d3.max(data, (d) => {
+				if (typeof d.value === "number") {
+					return d.value * 1.05;
+				} else if (typeof d.value === "object" && d.value !== null) {
+					return (
+						Object.values(d.value).reduce((sum, val) => sum + (+val || 0), 0) *
+						1.05
+					);
+				} else {
+					return 0;
+				}
+			}) ?? 0;
+
 		const yScaleBand = d3
 			.scaleLinear()
 			.domain([0, yAxisMax])

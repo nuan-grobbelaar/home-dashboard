@@ -13,7 +13,10 @@ import {
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import type { GridItem, GridItemPosition } from "./useGridItemPlacer";
-import type { WidgetComponentLayoutDefinition } from "./useWidgetDefinitionStore";
+import type {
+	QueryGroupBy,
+	WidgetComponentLayoutDefinition,
+} from "./useWidgetDefinitionStore";
 
 // The layout of widgets inside the widget grid
 export interface WidgetLayoutData {
@@ -32,7 +35,7 @@ export interface WidgetData {
 	datasource?: DocumentReference;
 	datasourceQuery?: {
 		collection: string;
-		groupBy: string;
+		groupBy: QueryGroupBy;
 		target: string;
 	};
 }

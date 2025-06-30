@@ -138,12 +138,11 @@
 
 .chart__barchart__bar {
   stroke: black;
+  color: black;
   stroke-width: 2px;
-  transition: y 0.6s ease, height 0.6s ease;
-  /* optionally fill transition */
   transition-property: y, height, fill;
-  transition-duration: 0.6s;
-  transition-timing-function: ease;
+  transition-duration: 0.2s;
+  transition-timing-function: linear;
 }
 
 .chart__x-axis {

@@ -18,17 +18,25 @@ export interface WidgetComponentDefinition {
 	props: { [key: string]: any };
 }
 
+export interface QueryGroupBy {
+	field: string;
+	granularity?: string;
+	then?: QueryGroupBy;
+}
+
+export interface Query {
+	collection: string;
+	groupBy: QueryGroupBy;
+	target: string;
+}
+
 export interface WidgetComponentLayoutDefinition {
 	id: string;
 	name: string;
 	rows: number;
 	columns: number;
 	datasourceApp: string;
-	datasourceQuery: {
-		collection: string;
-		groupBy: string;
-		target: string;
-	};
+	datasourceQuery: Query;
 	widgetComponentDefinitions: WidgetComponentDefinition[];
 }
 
