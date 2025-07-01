@@ -32,10 +32,8 @@ const Widget = (props: WidgetProps) => {
 		else return loading;
 	}, [loading, props.isLoading]);
 
-	const { widgetComponentLayout, widgetData } = useWidgetStore(
-		props,
-		setLoading
-	);
+	const { widgetComponentLayout, widgetData, insertIntoWidgetDatasource } =
+		useWidgetStore(props, setLoading);
 
 	const { loadWidgetDefinitions, widgetDefinitions } = useWidgetDefinitionStore(
 		false,
@@ -91,11 +89,18 @@ const Widget = (props: WidgetProps) => {
 					placerMode="NONE"
 				>
 					{widgetComponentLayout.components.map((component) => {
+						console.log("TYPE", "123", component.type);
 						const Component = widgetComponentRegistry[component.type];
 
 						return (
 							<WidgetComponent key={component.id} position={component.position}>
-								{<Component data={widgetData} {...component.props} />}
+								{
+									<Component
+										data={widgetData}
+										insert={insertIntoWidgetDatasource}
+										{...component.props}
+									/>
+								}
 							</WidgetComponent>
 						);
 					})}

@@ -14,6 +14,7 @@ import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import type { GridItem, GridItemPosition } from "./useGridItemPlacer";
 import type {
+	Query,
 	QueryGroupBy,
 	WidgetComponentLayoutDefinition,
 } from "./useWidgetDefinitionStore";
@@ -33,11 +34,7 @@ export interface WidgetData {
 	componentLayoutRef?: DocumentReference;
 	position: GridItemPosition;
 	datasource?: DocumentReference;
-	datasourceQuery?: {
-		collection: string;
-		groupBy: QueryGroupBy;
-		target: string;
-	};
+	datasourceQuery?: Query;
 }
 
 export type WidgetCreationData = WidgetComponentLayoutDefinition &

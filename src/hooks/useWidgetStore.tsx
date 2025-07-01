@@ -5,13 +5,20 @@ import {
 	getDoc,
 	type DocumentData,
 	Timestamp,
+	setDoc,
+	doc,
 } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import Barchart from "../components/graphs/Barchart";
 import type { WidgetData } from "./useWidgetGridStore";
 import type { WidgetLoading } from "../components/widget/Widget";
-import type { Query, QueryGroupBy } from "./useWidgetDefinitionStore";
+import type {
+	InsertField,
+	Query,
+	QueryGroupBy,
+} from "./useWidgetDefinitionStore";
+import InputForm from "../components/input/InputForm";
 
 const monthOrder = [
 	"jan",
@@ -28,13 +35,14 @@ const monthOrder = [
 	"dec",
 ];
 
-export type ComponentName = "barchart";
+export type ComponentName = "barchart" | "input";
 
 export const widgetComponentRegistry: Record<
 	ComponentName,
 	React.ComponentType<any>
 > = {
 	barchart: Barchart,
+	input: InputForm,
 };
 
 export interface WidgetComponent {
@@ -65,24 +73,29 @@ export function useWidgetStore(
 	const [widgetComponentLayout, setWidgetComponentLayout] =
 		useState<WidgetComponentLayout>();
 	const [widgetData, setWidgetData] = useState<
-		Array<{
-			[key: string]: string | number | { [key: string]: any };
-		}>
+		| Array<{
+				[key: string]: string | number | { [key: string]: any };
+		  }>
+		| Query
 	>();
 
 	useEffect(() => {
-		// setLoading?.({
-		// 	isLoading: true,
-		// 	message: "Loading widget component layout",
-		// });
 		loadWidgetComponentLayout();
-		queryWidgetDatasource();
 
-		const interval = setInterval(() => {
+		if (
+			widget.datasourceQuery &&
+			widget.datasourceQuery.groupBy &&
+			widget.datasourceQuery.target
+		) {
 			queryWidgetDatasource();
-		}, 10000);
+			const interval = setInterval(() => {
+				queryWidgetDatasource();
+			}, 2000);
 
-		return () => clearInterval(interval);
+			return () => clearInterval(interval);
+		} else if (widget.datasourceQuery && widget.datasourceQuery.insert) {
+			setWidgetData(widget.datasourceQuery);
+		}
 	}, [widget]);
 
 	async function getWidgetComponentLayout(widgetRef: DocumentReference) {
@@ -135,12 +148,12 @@ export function useWidgetStore(
 		}
 	}
 
-	function getKey(dataPoint: DocumentData, query: Query) {
-		const rawKey = dataPoint[query.groupBy.field];
+	function getKey(dataPoint: DocumentData, queryGroupBy: QueryGroupBy) {
+		const rawKey = dataPoint[queryGroupBy.field];
 
-		if (query.groupBy.field === "timestamp" && rawKey instanceof Timestamp) {
+		if (queryGroupBy.field === "timestamp" && rawKey instanceof Timestamp) {
 			const date = rawKey.toDate();
-			if (query.groupBy.granularity === "month") {
+			if (queryGroupBy.granularity === "month") {
 				return date.toLocaleString("default", { month: "short" });
 			}
 		}
@@ -168,11 +181,17 @@ export function useWidgetStore(
 	}
 
 	function processData(rawData: DocumentData[], query: Query) {
+		if (query.groupBy === undefined || query.target === undefined)
+			return rawData;
+
+		const queryGroupBy = query.groupBy;
+		const queryTarget = query.target;
+
 		const aggregatedData: Record<string, number | any[] | Record<any, any>> =
 			rawData.reduce((agg, dataPoint) => {
-				const key = getKey(dataPoint, query);
+				const key = getKey(dataPoint, queryGroupBy);
 
-				if (query.groupBy.then) {
+				if (queryGroupBy.then) {
 					const collected =
 						Array.isArray(agg[key]) && agg[key].length > 0
 							? [...agg[key], dataPoint]
@@ -181,7 +200,7 @@ export function useWidgetStore(
 					agg[key] = collected;
 					console.log("DATA", "agg", dataPoint);
 				} else {
-					const value = +dataPoint[query.target]!;
+					const value = +dataPoint[queryTarget]!;
 					agg[key] = agg[key] ? agg[key] + value : value;
 				}
 
@@ -235,6 +254,29 @@ export function useWidgetStore(
 		});
 	}
 
+	function insertIntoWidgetDatasource(datasourceEntryData: {
+		[field: string]: any;
+	}) {
+		const user = auth.currentUser;
+		if (!user) return Promise.reject(new Error("Not authenticated"));
+
+		const { datasource, datasourceQuery } = widget;
+
+		if (!datasource || !datasourceQuery) return Promise.reject(); //remove later
+
+		const entryId = crypto.randomUUID();
+
+		const entryRef = doc(datasource, datasourceQuery.collection, entryId);
+
+		console.log("INSERTING", datasourceEntryData, "into", entryRef);
+
+		setDoc(entryRef, datasourceEntryData, { merge: true })
+			.then(() => {})
+			.catch((err) => {
+				throw err;
+			});
+	}
+
 	function loadWidgetComponentLayout() {
 		if (!widget.dbRef) return;
 		setLoading?.({
@@ -246,5 +288,5 @@ export function useWidgetStore(
 			.finally(() => setLoading?.({ isLoading: false }));
 	}
 
-	return { widgetComponentLayout, widgetData };
+	return { widgetComponentLayout, widgetData, insertIntoWidgetDatasource };
 }

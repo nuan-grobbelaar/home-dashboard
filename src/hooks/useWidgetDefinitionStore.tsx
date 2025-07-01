@@ -8,6 +8,7 @@ import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import type { GridItemPosition } from "./useGridItemPlacer";
 import type { WidgetLoading } from "../components/widget/Widget";
+import type { InputType } from "../components/input/InputForm";
 
 export interface WidgetComponentDefinition {
 	id: string;
@@ -24,10 +25,17 @@ export interface QueryGroupBy {
 	then?: QueryGroupBy;
 }
 
+export interface InsertField {
+	type: InputType;
+	required: boolean;
+	datasource?: string; // TODO: change to ref
+}
+
 export interface Query {
 	collection: string;
-	groupBy: QueryGroupBy;
-	target: string;
+	insert?: { [field: string]: InsertField };
+	groupBy?: QueryGroupBy;
+	target?: string;
 }
 
 export interface WidgetComponentLayoutDefinition {

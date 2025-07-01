@@ -1,0 +1,20 @@
+import type { InputProps } from "./InputForm";
+
+export interface NumberInputProps extends InputProps {}
+
+const NumberInput = (props: NumberInputProps) => {
+	return (
+		<div className="input" data-hasValue={props.value && props.value != ""}>
+			<label htmlFor={props.id}>{props.id}</label>
+			<input
+				name={props.id}
+				type="number"
+				step=".01"
+				value={props.value ? props.value : ""}
+				onChange={(e) => props.onInputChange(props.id, e.target.value)}
+			/>
+		</div>
+	);
+};
+
+export default NumberInput;
