@@ -1,13 +1,13 @@
-import Graph, { isGraphDataArray } from "./Graph";
-import XAxisScaling from "./XAxisScaling";
-import YAxisLinear from "./YAxisLinear";
-import GridLines from "./GridLines";
-import Bars from "./Bars";
-import StackedBars from "./StackedBars";
-import { type WidgetDatasourceData } from "../../hooks/useWidgetStore";
+import Graph, { isGraphDataArray } from "../graph-components/Graph";
+import XAxisScaling from "../graph-components/XAxisScaling";
+import YAxisLinear from "../graph-components/YAxisLinear";
+import GridLines from "../graph-components/GridLines";
+import Bars from "../graph-components/Bars";
+import StackedBars from "../graph-components/StackedBars";
+import type { WidgetDatasourceQueryResponseData } from "../../hooks/firestore/types";
 
 export interface BarchartProps {
-	data: WidgetDatasourceData;
+	data: WidgetDatasourceQueryResponseData;
 	xAxisLabel?: string;
 	yAxisLabel?: string;
 }

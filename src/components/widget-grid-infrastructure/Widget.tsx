@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
-import type { GridItem } from "../../hooks/useGridItemPlacer";
+import type { GridItem } from "../../hooks/grid/useGridItemPlacer";
 import Grid from "./Grid";
 import WidgetComponent from "./WidgetComponent";
 import {
 	useWidgetStore,
 	widgetComponentRegistry,
-} from "../../hooks/useWidgetStore";
-import type { WidgetData } from "../../hooks/useWidgetGridStore";
-import { useWidgetDefinitionStore } from "../../hooks/useWidgetDefinitionStore";
+} from "../../hooks/firestore/useWidgetStore";
+import { useWidgetDefinitionStore } from "../../hooks/firestore/useWidgetDefinitionStore";
 import LoadingBar from "./LoadingBar";
+import type { WidgetDocument } from "../../hooks/firestore/types";
 
-export interface WidgetProps extends WidgetData, GridItem, PropsWithChildren {}
+export interface WidgetProps
+	extends WidgetDocument,
+		GridItem,
+		PropsWithChildren {}
 
 export interface WidgetLoading {
 	isLoading: boolean;

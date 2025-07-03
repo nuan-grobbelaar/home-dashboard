@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { FillerProps } from "../components/widget/Filler";
-import type { WidgetProps } from "../components/widget/Widget";
+import type { FillerProps } from "../components/widget-grid-infrastructure/Filler";
+import type { WidgetProps } from "../components/widget-grid-infrastructure/Widget";
 
 export interface WidgetState {
 	isDragging: boolean;

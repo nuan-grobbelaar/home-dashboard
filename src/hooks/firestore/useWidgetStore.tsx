@@ -8,17 +8,21 @@ import {
 	setDoc,
 	doc,
 } from "firebase/firestore";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
-import Barchart from "../components/graphs/Barchart";
-import type { WidgetData } from "./useWidgetGridStore";
-import type { WidgetLoading } from "../components/widget/Widget";
-import type {
-	InsertQuery,
-	Query,
-	QueryGroupBy,
-} from "./useWidgetDefinitionStore";
-import InputForm from "../components/input/InputForm";
+import Barchart from "../../components/widget-components/Barchart";
+import type { WidgetLoading } from "../../components/widget-grid-infrastructure/Widget";
+import InputForm from "../../components/widget-components/InputForm";
+import {
+	isInsertQuery,
+	type ComponentName,
+	type Query,
+	type QueryGroupBy,
+	type WidgetComponentDocument,
+	type WidgetComponentLayoutDocument,
+	type WidgetDatasourceQueryResponseData,
+	type WidgetDocument,
+} from "./types";
 
 const monthOrder = [
 	"jan",
@@ -35,8 +39,6 @@ const monthOrder = [
 	"dec",
 ];
 
-export type ComponentName = "barchart" | "input";
-
 export const widgetComponentRegistry: Record<
 	ComponentName,
 	React.ComponentType<any>
@@ -45,54 +47,15 @@ export const widgetComponentRegistry: Record<
 	input: InputForm,
 };
 
-export interface WidgetComponent {
-	id: string;
-	type: ComponentName;
-	position: {
-		rowStart: number;
-		rowEnd: number;
-		colStart: number;
-		colEnd: number;
-	};
-	componentReference: DocumentReference;
-	props: { [key: string]: any };
-}
-
-export function isQuery(value: any): value is Query {
-	return (
-		value &&
-		typeof value === "object" &&
-		("insert" in value || "target" in value)
-	);
-}
-
-export function isInsertQuery(value: any): value is InsertQuery {
-	return value && typeof value === "object" && "insert" in value;
-}
-
-export interface WidgetComponentLayout {
-	datasource: string;
-	rows: number;
-	columns: number;
-	components: Array<WidgetComponent>;
-}
-
-export interface WidgetDatasourceData {
-	[datasourceName: string]:
-		| Array<{
-				[key: string]: string | number | { [key: string]: any };
-		  }>
-		| Query;
-}
-
 export function useWidgetStore(
-	widget: WidgetData,
+	widget: WidgetDocument,
 	setLoading?: (loading: WidgetLoading) => void
 	// setError?: (error: String | null) => void
 ) {
 	const [widgetComponentLayout, setWidgetComponentLayout] =
-		useState<WidgetComponentLayout>();
-	const [widgetData, setWidgetData] = useState<WidgetDatasourceData>();
+		useState<WidgetComponentLayoutDocument>();
+	const [widgetData, setWidgetData] =
+		useState<WidgetDatasourceQueryResponseData>();
 
 	useEffect(() => {
 		loadWidgetComponentLayout();
@@ -113,7 +76,7 @@ export function useWidgetStore(
 		const widgetSnapshot = await getDoc(widgetRef);
 
 		if (widgetSnapshot.exists()) {
-			const componentLayoutRef: DocumentReference<WidgetComponentLayout> =
+			const componentLayoutRef: DocumentReference<WidgetComponentLayoutDocument> =
 				widgetSnapshot.get("componentLayoutRef");
 
 			const componentLayoutSnapshot = await getDoc(componentLayoutRef);
@@ -122,7 +85,7 @@ export function useWidgetStore(
 				const layout = {
 					id: componentLayoutSnapshot.id,
 					...componentLayoutSnapshot.data(),
-				} as WidgetComponentLayout;
+				} as WidgetComponentLayoutDocument;
 
 				const componentCollectionRef = collection(
 					componentLayoutRef,
@@ -131,13 +94,13 @@ export function useWidgetStore(
 
 				const componentsSnapshot = await getDocs(componentCollectionRef);
 
-				const components: Array<WidgetComponent> = [];
+				const components: Array<WidgetComponentDocument> = [];
 				if (!componentsSnapshot.empty) {
 					componentsSnapshot.docs.map((component) =>
 						components.push({
 							id: component.id,
 							...component.data(),
-						} as WidgetComponent)
+						} as WidgetComponentDocument)
 					);
 				}
 
@@ -309,7 +272,7 @@ export function useWidgetStore(
 
 	function loadWidgetDataFromDatasources() {
 		if (!widget.datasources) return;
-		const datasources: WidgetDatasourceData = {};
+		const datasources: WidgetDatasourceQueryResponseData = {};
 		for (const datasourceName of Object.keys(widget.datasources)) {
 			loadWidgetDataFromDatasource(datasourceName).then((data) => {
 				if (data) datasources[datasourceName] = data;

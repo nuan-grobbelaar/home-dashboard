@@ -1,4 +1,4 @@
-import type { InputProps } from "./InputForm";
+import type { InputProps } from "../widget-components/InputForm";
 
 export interface NumberInputProps extends InputProps {}
 

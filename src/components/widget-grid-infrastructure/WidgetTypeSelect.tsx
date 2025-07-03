@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { type WidgetDefinition } from "../../hooks/useWidgetDefinitionStore";
-import type { WidgetCreationData } from "../../hooks/useWidgetGridStore";
-import type { GridItemPosition } from "../../hooks/useGridItemPlacer";
+import { type WidgetDefinition } from "../../hooks/firestore/useWidgetDefinitionStore";
+import type { WidgetCreationData } from "../../hooks/firestore/useWidgetGridStore";
+import type { GridItemPosition } from "../../hooks/grid/useGridItemPlacer";
 
 export interface WidgetTypeSelectProps {
 	widgetDefinitions: WidgetDefinition[];

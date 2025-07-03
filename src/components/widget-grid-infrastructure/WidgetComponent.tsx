@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import type { GridItem } from "../../hooks/useGridItemPlacer";
+import type { GridItem } from "../../hooks/grid/useGridItemPlacer";
 
 export interface WidgetComponentProps extends GridItem, PropsWithChildren {
 	id?: any;

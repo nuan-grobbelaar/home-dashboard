@@ -8,43 +8,15 @@ import {
 	writeBatch,
 	doc,
 	deleteDoc,
-	DocumentReference,
 } from "firebase/firestore";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
-import type { GridItem, GridItemPosition } from "./useGridItemPlacer";
 import type {
-	Query,
-	QueryGroupBy,
-	WidgetComponentLayoutDefinition,
-} from "./useWidgetDefinitionStore";
-
-// The layout of widgets inside the widget grid
-export interface WidgetLayoutData {
-	id?: any;
-	rows: number;
-	columns: number;
-	widgets: Array<WidgetData>;
-}
-
-export interface WidgetDatasource {
-	datasource?: DocumentReference;
-	datasourceQuery?: Query;
-}
-
-export interface WidgetData {
-	id?: any;
-	dbRef?: DocumentReference;
-	type?: string;
-	componentLayoutRef?: DocumentReference;
-	position: GridItemPosition;
-	datasources: { [datasourceName: string]: WidgetDatasource };
-}
-
-export type WidgetCreationData = WidgetComponentLayoutDefinition &
-	GridItem & {
-		type: string;
-	};
+	WidgetCreationData,
+	WidgetDatasourceDocument,
+	WidgetDocument,
+	WidgetLayoutDocument,
+} from "./types";
 
 export function useWidgetGridStore(
 	setLoading: (isLoading: boolean) => void,
@@ -53,7 +25,7 @@ export function useWidgetGridStore(
 	const db = getFirestore();
 
 	// const [layouts, setLayouts] = useState<Layout[]>([]);
-	const [activeLayout, setActiveLayout] = useState<WidgetLayoutData | null>(
+	const [activeLayout, setActiveLayout] = useState<WidgetLayoutDocument | null>(
 		null
 	);
 
@@ -91,7 +63,7 @@ export function useWidgetGridStore(
 							d.id
 						),
 						...d.data(),
-					} as WidgetData)
+					} as WidgetDocument)
 			);
 		} else {
 			console.warn("No widgets found in layout.");
@@ -125,7 +97,7 @@ export function useWidgetGridStore(
 						id: doc.id,
 						widgets,
 						...doc.data(),
-					} as WidgetLayoutData);
+					} as WidgetLayoutDocument);
 				});
 			})
 			.catch((err) => {
@@ -149,7 +121,7 @@ export function useWidgetGridStore(
 
 		const defaultDatasource = widget.datasources["default"];
 
-		const widgetData: WidgetData = {
+		const widgetData: WidgetDocument = {
 			componentLayoutRef: doc(
 				db,
 				"widgets",
@@ -159,7 +131,7 @@ export function useWidgetGridStore(
 			),
 			type: data.type,
 			datasources: Object.entries(widget.datasources).reduce<{
-				[key: string]: WidgetDatasource;
+				[key: string]: WidgetDatasourceDocument;
 			}>((agg, [datasourceName, datasourceData]) => {
 				const datasource = datasourceData.datasource
 					? datasourceData.datasource
@@ -209,7 +181,7 @@ export function useWidgetGridStore(
 			});
 	}
 
-	function saveLayout(layout: WidgetLayoutData) {
+	function saveLayout(layout: WidgetLayoutDocument) {
 		const user = auth.currentUser;
 		if (!user) throw new Error("Not authenticated");
 

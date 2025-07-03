@@ -1,17 +1,16 @@
 import { useState } from "react";
-import type { InsertQuery, Query } from "../../hooks/useWidgetDefinitionStore";
-import TextInput from "./TextInput";
-import NumberInput from "./NumberInput";
-import DateInput from "./DateInput";
+import TextInput from "../input-fields/TextInput";
+import NumberInput from "../input-fields/NumberInput";
+import DateInput from "../input-fields/DateInput";
+import SelectInput from "../input-fields/SelectInput";
 import {
 	isInsertQuery,
-	isQuery,
-	type WidgetDatasourceData,
-} from "../../hooks/useWidgetStore";
-import SelectInput from "./SelectInput";
+	type InsertQuery,
+	type WidgetDatasourceQueryResponseData,
+} from "../../hooks/firestore/types";
 
 export interface InputFormProps {
-	data: WidgetDatasourceData;
+	data: WidgetDatasourceQueryResponseData;
 	insert: (data: { [field: string]: any }) => void;
 }
 

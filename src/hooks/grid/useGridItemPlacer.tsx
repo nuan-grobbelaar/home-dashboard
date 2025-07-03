@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import type { FillerProps } from "../components/widget/Filler";
-import type { WidgetLoading } from "../components/widget/Widget";
+import type { FillerProps } from "../../components/widget-grid-infrastructure/Filler";
+import type { WidgetLoading } from "../../components/widget-grid-infrastructure/Widget";
 
 export interface GridItemPosition {
 	colStart: number;

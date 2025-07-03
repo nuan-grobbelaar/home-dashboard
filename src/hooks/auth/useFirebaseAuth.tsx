@@ -3,7 +3,7 @@ import { httpsCallable } from "firebase/functions";
 import { signInWithCustomToken } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { useAuth0 } from "@auth0/auth0-react";
-import { auth, functions } from "../firebase";
+import { auth, functions } from "../../firebase";
 
 interface Auth0ToFirebaseRequest {
 	token: string;

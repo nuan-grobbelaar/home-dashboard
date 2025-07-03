@@ -1,12 +1,14 @@
-import Grid from "../components/widget/Grid";
-import Widget, { getWidgetId } from "../components/widget/Widget";
+import Grid from "../components/widget-grid-infrastructure/Grid";
+import Widget, {
+	getWidgetId,
+} from "../components/widget-grid-infrastructure/Widget";
 import { useState } from "react";
-import {
-	useWidgetGridStore,
-	type WidgetCreationData,
-	type WidgetData,
-} from "../hooks/useWidgetGridStore";
-import { useFirebaseAuth } from "../hooks/useFirebaseAuth";
+import { useWidgetGridStore } from "../hooks/firestore/useWidgetGridStore";
+import { useFirebaseAuth } from "../hooks/auth/useFirebaseAuth";
+import type {
+	WidgetCreationData,
+	WidgetDocument,
+} from "../hooks/firestore/types";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
@@ -43,7 +45,7 @@ const Home = () => {
 						saveWidget(activeLayout.id, item);
 					}}
 				>
-					{activeLayout.widgets.map((widget: WidgetData) => (
+					{activeLayout.widgets.map((widget: WidgetDocument) => (
 						<Widget
 							key={getWidgetId(widget)}
 							{...widget}

@@ -1,65 +1,12 @@
-import {
-	collection,
-	getDocs,
-	DocumentReference,
-	getFirestore,
-} from "firebase/firestore";
-import { auth } from "../firebase";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
-import type { GridItemPosition } from "./useGridItemPlacer";
-import type { WidgetLoading } from "../components/widget/Widget";
-import type { InputType } from "../components/input/InputForm";
-
-export interface WidgetComponentDefinition {
-	id: string;
-	// This is a reference to the base component
-	componentDefinitionReference: DocumentReference;
-	position: GridItemPosition;
-	type: string;
-	props: { [key: string]: any };
-}
-
-export interface QueryGroupBy {
-	field: string;
-	granularity?: string;
-	then?: QueryGroupBy;
-}
-
-export interface InsertField {
-	type: InputType;
-	required: boolean;
-	datasource?: string; // TODO: change to ref
-}
-
-export interface Query {
-	collection: string;
-	groupBy?: QueryGroupBy;
-	target?: string;
-}
-
-export interface InsertQuery extends Query {
-	insert: { [field: string]: InsertField };
-}
-
-export interface WidgetDatasourceDefinition {
-	datasource?: DocumentReference;
-	datasourceApp?: string;
-	datasourceQuery: Query;
-}
-
-export interface WidgetComponentLayoutDefinition {
-	id: string;
-	name: string;
-	rows: number;
-	columns: number;
-	datasources: { [datasourceName: string]: WidgetDatasourceDefinition };
-	widgetComponentDefinitions: WidgetComponentDefinition[];
-}
-
-export interface WidgetDefinition {
-	type: string;
-	widgetComponentLayoutDefinitions: WidgetComponentLayoutDefinition[];
-}
+import type { WidgetLoading } from "../../components/widget-grid-infrastructure/Widget";
+import type {
+	WidgetComponentDefinitionDocument,
+	WidgetComponentLayoutDefinitionDocument,
+	WidgetDefinition,
+} from "./types";
 
 export function useWidgetDefinitionStore(
 	auto: boolean = true,
@@ -109,7 +56,7 @@ export function useWidgetDefinitionStore(
 									({
 										id: cd.id,
 										...cd.data(),
-									} as WidgetComponentDefinition)
+									} as WidgetComponentDefinitionDocument)
 						  )
 						: [];
 
@@ -117,7 +64,7 @@ export function useWidgetDefinitionStore(
 						id: cld.id,
 						widgetComponentDefinitions: componentDefinitions,
 						...cld.data(),
-					} as WidgetComponentLayoutDefinition;
+					} as WidgetComponentLayoutDefinitionDocument;
 				})
 			);
 		}

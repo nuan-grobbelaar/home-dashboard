@@ -1,4 +1,4 @@
-import type { InputProps } from "./InputForm";
+import type { InputProps } from "../widget-components/InputForm";
 
 export interface SelectInputProps extends InputProps {
 	options: Array<{ id: any; value: any; title: string }>;

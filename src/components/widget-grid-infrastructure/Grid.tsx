@@ -5,7 +5,7 @@ import {
 	useGridItemPlacer,
 	type GridItem,
 	type PlacerMode,
-} from "../../hooks/useGridItemPlacer";
+} from "../../hooks/grid/useGridItemPlacer";
 
 interface GridProps<P extends GridItem> extends PropsWithChildren {
 	columns: number;
