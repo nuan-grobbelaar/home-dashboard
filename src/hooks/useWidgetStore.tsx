@@ -14,7 +14,7 @@ import Barchart from "../components/graphs/Barchart";
 import type { WidgetData } from "./useWidgetGridStore";
 import type { WidgetLoading } from "../components/widget/Widget";
 import type {
-	InsertField,
+	InsertQuery,
 	Query,
 	QueryGroupBy,
 } from "./useWidgetDefinitionStore";
@@ -58,11 +58,31 @@ export interface WidgetComponent {
 	props: { [key: string]: any };
 }
 
+export function isQuery(value: any): value is Query {
+	return (
+		value &&
+		typeof value === "object" &&
+		("insert" in value || "target" in value)
+	);
+}
+
+export function isInsertQuery(value: any): value is InsertQuery {
+	return value && typeof value === "object" && "insert" in value;
+}
+
 export interface WidgetComponentLayout {
 	datasource: string;
 	rows: number;
 	columns: number;
 	components: Array<WidgetComponent>;
+}
+
+export interface WidgetDatasourceData {
+	[datasourceName: string]:
+		| Array<{
+				[key: string]: string | number | { [key: string]: any };
+		  }>
+		| Query;
 }
 
 export function useWidgetStore(
@@ -72,30 +92,18 @@ export function useWidgetStore(
 ) {
 	const [widgetComponentLayout, setWidgetComponentLayout] =
 		useState<WidgetComponentLayout>();
-	const [widgetData, setWidgetData] = useState<
-		| Array<{
-				[key: string]: string | number | { [key: string]: any };
-		  }>
-		| Query
-	>();
+	const [widgetData, setWidgetData] = useState<WidgetDatasourceData>();
 
 	useEffect(() => {
 		loadWidgetComponentLayout();
 
-		if (
-			widget.datasourceQuery &&
-			widget.datasourceQuery.groupBy &&
-			widget.datasourceQuery.target
-		) {
-			queryWidgetDatasource();
-			const interval = setInterval(() => {
-				queryWidgetDatasource();
-			}, 2000);
-
-			return () => clearInterval(interval);
-		} else if (widget.datasourceQuery && widget.datasourceQuery.insert) {
-			setWidgetData(widget.datasourceQuery);
-		}
+		loadWidgetDataFromDatasources();
+		// const interval = setInterval(() => {
+		// 	loadWidgetDataFromDatasource("default").then((data) => {
+		// 		if (data) setWidgetData({ ...widgetData, default: data }); //TODO: race condition
+		// 	});
+		// }, 5000);
+		// return () => clearInterval(interval);
 	}, [widget]);
 
 	async function getWidgetComponentLayout(widgetRef: DocumentReference) {
@@ -105,7 +113,6 @@ export function useWidgetStore(
 		const widgetSnapshot = await getDoc(widgetRef);
 
 		if (widgetSnapshot.exists()) {
-			console.log("useWidgetStore", widgetSnapshot.data());
 			const componentLayoutRef: DocumentReference<WidgetComponentLayout> =
 				widgetSnapshot.get("componentLayoutRef");
 
@@ -135,7 +142,6 @@ export function useWidgetStore(
 				}
 
 				layout.components = components;
-				console.log("useWidgetStore", "components", components);
 
 				return layout;
 			} else {
@@ -198,9 +204,10 @@ export function useWidgetStore(
 							: [dataPoint];
 
 					agg[key] = collected;
-					console.log("DATA", "agg", dataPoint);
 				} else {
-					const value = +dataPoint[queryTarget]!;
+					// Only sum if number, TODO: replace with "agg func" defined in query
+					const rawValue = dataPoint[queryTarget];
+					const value = isNaN(+rawValue) ? rawValue : +rawValue;
 					agg[key] = agg[key] ? agg[key] + value : value;
 				}
 
@@ -223,11 +230,13 @@ export function useWidgetStore(
 		return sortedAggregatedData;
 	}
 
-	function queryWidgetDatasource() {
+	async function queryWidgetDatasource(
+		datasourceName: string,
+		datasource: DocumentReference,
+		datasourceQuery: Query
+	) {
 		const user = auth.currentUser;
 		if (!user) return Promise.reject(new Error("Not authenticated"));
-
-		const { datasource, datasourceQuery } = widget;
 
 		if (!datasource || !datasourceQuery) return Promise.reject(); //remove later
 
@@ -236,22 +245,19 @@ export function useWidgetStore(
 			datasourceQuery.collection
 		);
 
-		getDocs(datasourceCollectionRef).then((dataSnapshot) => {
-			if (!dataSnapshot.empty) {
-				const rawData = dataSnapshot.docs.map((d) => d.data());
-				console.log("DATA", "raw", rawData);
-				const aggregatedData = processData(rawData, datasourceQuery);
-				console.log("DATA", "agg", aggregatedData);
+		const dataSnapshot = await getDocs(datasourceCollectionRef);
 
-				const data = Object.entries(aggregatedData).map(([key, value]) => ({
-					title: key,
-					value: value,
-				}));
+		if (!dataSnapshot.empty) {
+			const rawData = dataSnapshot.docs.map((d) => d.data());
+			const aggregatedData = processData(rawData, datasourceQuery);
 
-				console.log("useWidgetStore", "data", data);
-				setWidgetData(data);
-			}
-		});
+			const data = Object.entries(aggregatedData).map(([key, value]) => ({
+				title: key,
+				value: value,
+			}));
+
+			return data;
+		}
 	}
 
 	function insertIntoWidgetDatasource(datasourceEntryData: {
@@ -260,7 +266,7 @@ export function useWidgetStore(
 		const user = auth.currentUser;
 		if (!user) return Promise.reject(new Error("Not authenticated"));
 
-		const { datasource, datasourceQuery } = widget;
+		const { datasource, datasourceQuery } = widget.datasources["default"];
 
 		if (!datasource || !datasourceQuery) return Promise.reject(); //remove later
 
@@ -268,13 +274,53 @@ export function useWidgetStore(
 
 		const entryRef = doc(datasource, datasourceQuery.collection, entryId);
 
-		console.log("INSERTING", datasourceEntryData, "into", entryRef);
-
 		setDoc(entryRef, datasourceEntryData, { merge: true })
 			.then(() => {})
 			.catch((err) => {
 				throw err;
 			});
+	}
+
+	async function loadWidgetDataFromDatasource(datasourceName: string) {
+		if (!widget.datasources || !(datasourceName in widget.datasources)) return;
+
+		const { datasource, datasourceQuery } = widget.datasources[datasourceName];
+
+		if (datasource && datasourceQuery) {
+			if (datasourceQuery.groupBy && datasourceQuery.target) {
+				return await queryWidgetDatasource(
+					datasourceName,
+					datasource,
+					datasourceQuery
+				);
+			} else if (isInsertQuery(datasourceQuery)) {
+				return datasourceQuery;
+			} else {
+				console.warn(
+					`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
+				);
+			}
+		} else {
+			console.warn(
+				`No datasource defined for widget ${widget.id} with name: ${datasourceName}`
+			);
+		}
+	}
+
+	function loadWidgetDataFromDatasources() {
+		if (!widget.datasources) return;
+		const datasources: WidgetDatasourceData = {};
+		for (const datasourceName of Object.keys(widget.datasources)) {
+			loadWidgetDataFromDatasource(datasourceName).then((data) => {
+				if (data) datasources[datasourceName] = data;
+				else
+					console.warn(
+						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
+					);
+			});
+		}
+
+		setWidgetData(datasources);
 	}
 
 	function loadWidgetComponentLayout() {

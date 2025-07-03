@@ -1,11 +1,17 @@
 import { useState } from "react";
-import type { Query } from "../../hooks/useWidgetDefinitionStore";
+import type { InsertQuery, Query } from "../../hooks/useWidgetDefinitionStore";
 import TextInput from "./TextInput";
 import NumberInput from "./NumberInput";
 import DateInput from "./DateInput";
+import {
+	isInsertQuery,
+	isQuery,
+	type WidgetDatasourceData,
+} from "../../hooks/useWidgetStore";
+import SelectInput from "./SelectInput";
 
 export interface InputFormProps {
-	data: Query;
+	data: WidgetDatasourceData;
 	insert: (data: { [field: string]: any }) => void;
 }
 
@@ -15,7 +21,7 @@ export interface InputProps {
 	onInputChange: (id: string, value: any) => void;
 }
 
-export type InputType = "text" | "number" | "select" | "timestamp";
+export type InputType = "text" | "number" | "select" | "datetime";
 
 export const widgetComponentRegistry: Record<
 	InputType,
@@ -23,11 +29,20 @@ export const widgetComponentRegistry: Record<
 > = {
 	text: TextInput,
 	number: NumberInput,
-	select: TextInput,
-	timestamp: DateInput,
+	select: SelectInput,
+	datetime: DateInput,
 };
 
 const InputForm = (props: InputFormProps) => {
+	const defaultDatasource = props.data["default"];
+
+	if (!defaultDatasource) throw new Error("Default datasource not set"); //TODO: need better handling
+
+	if (!isInsertQuery(defaultDatasource))
+		throw new Error("Datasource not a query"); //TODO: need better handling
+
+	const insertQuery: InsertQuery = defaultDatasource;
+
 	const [formData, setFormData] = useState<{ [field: string]: any }>({});
 
 	const handleInputChange = (id: string, value: string) => {
@@ -45,14 +60,24 @@ const InputForm = (props: InputFormProps) => {
 
 	return (
 		<div className="input-form">
-			<form className="input-form__form" onSubmit={handleSubmit}>
-				{props.data.insert &&
-					Object.entries(props.data.insert).map(([field, properties]) => {
+			<form
+				className="input-form__form"
+				onSubmit={handleSubmit}
+				autoComplete="off"
+			>
+				{insertQuery.insert &&
+					Object.entries(insertQuery.insert).map(([field, properties]) => {
 						const FormInput = widgetComponentRegistry[properties.type];
+						const options =
+							properties.type == "select" && properties.datasource
+								? props.data[properties.datasource]
+								: null;
+
 						return (
 							<FormInput
 								id={field}
 								onInputChange={handleInputChange}
+								options={options}
 								value={formData[field]}
 							/>
 						);

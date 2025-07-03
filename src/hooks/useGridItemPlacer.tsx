@@ -54,7 +54,6 @@ export function useGridItemPlacer<T extends GridItem>(
 	}, [selectedFiller]);
 
 	const addGridItem = (item: T) => {
-		console.log("mouse up", item);
 		setPlacedItem(item);
 	};
 
@@ -76,7 +75,6 @@ export function useGridItemPlacer<T extends GridItem>(
 		setIsDragging(true);
 		setPlacedItem(null);
 		setSelectedFiller([filler]);
-		console.log("mouse down", "selected", selectedFillerRef.current);
 		e.preventDefault();
 	};
 
@@ -88,8 +86,6 @@ export function useGridItemPlacer<T extends GridItem>(
 		let maxRow = -Infinity;
 		let minCol = Infinity;
 		let maxCol = -Infinity;
-
-		console.log("isSelectionInUnoccupiedSpace", "occupied", occupiedPositions);
 
 		for (const s of [...selectedFillerRef.current, filler]) {
 			if (s.row < minRow) minRow = s.row;
@@ -123,7 +119,6 @@ export function useGridItemPlacer<T extends GridItem>(
 	};
 
 	const handleMouseUp = (e: React.MouseEvent) => {
-		console.log("mouse up", isDragging, "selected", selectedFillerRef.current);
 		if (!isDraggingRef.current) return;
 		setIsDragging(false);
 		addGridItem({
@@ -142,7 +137,6 @@ export function useGridItemPlacer<T extends GridItem>(
 			},
 		} as T);
 		setSelectedFiller([]);
-		console.log("dragging ended", isDragging);
 		e.preventDefault();
 	};
 

@@ -1,21 +1,33 @@
-import type { GraphData } from "./Graph";
-import Graph from "./Graph";
+import Graph, { isGraphDataArray } from "./Graph";
 import XAxisScaling from "./XAxisScaling";
 import YAxisLinear from "./YAxisLinear";
 import GridLines from "./GridLines";
 import Bars from "./Bars";
 import StackedBars from "./StackedBars";
+import { type WidgetDatasourceData } from "../../hooks/useWidgetStore";
 
 export interface BarchartProps {
-	data: GraphData[];
+	data: WidgetDatasourceData;
 	xAxisLabel?: string;
 	yAxisLabel?: string;
 }
 
 const Barchart = (props: BarchartProps) => {
+	const defaultDatasource = props.data["default"];
+
+	if (!defaultDatasource) {
+		console.warn(`Default datasource not set`, props.data);
+		return null;
+	}
+
+	if (!isGraphDataArray(defaultDatasource))
+		throw new Error("Datasource does not contain GraphData"); //TODO: need better handling
+
+	const graphData = defaultDatasource;
+
 	return (
 		<Graph
-			data={props.data}
+			data={graphData}
 			margins={{
 				left: props.yAxisLabel ? 20 : 0,
 				bottom: props.xAxisLabel ? 20 : 0,
@@ -24,7 +36,7 @@ const Barchart = (props: BarchartProps) => {
 			<XAxisScaling label={props.xAxisLabel} />
 			<YAxisLinear label={props.yAxisLabel} />
 			<GridLines />
-			{props.data.find(
+			{graphData.find(
 				(d) => typeof d.value === "object" && d.value !== null
 			) ? (
 				<StackedBars

@@ -27,14 +27,18 @@ export interface WidgetLayoutData {
 	widgets: Array<WidgetData>;
 }
 
+export interface WidgetDatasource {
+	datasource?: DocumentReference;
+	datasourceQuery?: Query;
+}
+
 export interface WidgetData {
 	id?: any;
 	dbRef?: DocumentReference;
 	type?: string;
 	componentLayoutRef?: DocumentReference;
 	position: GridItemPosition;
-	datasource?: DocumentReference;
-	datasourceQuery?: Query;
+	datasources: { [datasourceName: string]: WidgetDatasource };
 }
 
 export type WidgetCreationData = WidgetComponentLayoutDefinition &
@@ -55,7 +59,6 @@ export function useWidgetGridStore(
 
 	useEffect(() => {
 		loadActiveLayout();
-		console.log("useWidgetGridStore", "layout", activeLayout);
 	}, []);
 
 	async function getWidgets(layoutId: string) {
@@ -91,7 +94,7 @@ export function useWidgetGridStore(
 					} as WidgetData)
 			);
 		} else {
-			console.log("No widgets found in layout.");
+			console.warn("No widgets found in layout.");
 			return [];
 		}
 	}
@@ -144,6 +147,8 @@ export function useWidgetGridStore(
 
 		const { id, ...data } = widget;
 
+		const defaultDatasource = widget.datasources["default"];
+
 		const widgetData: WidgetData = {
 			componentLayoutRef: doc(
 				db,
@@ -153,12 +158,26 @@ export function useWidgetGridStore(
 				id
 			),
 			type: data.type,
-			datasource: doc(db, "users", user.uid, "apps", data.datasourceApp),
-			datasourceQuery: data.datasourceQuery,
+			datasources: Object.entries(widget.datasources).reduce<{
+				[key: string]: WidgetDatasource;
+			}>((agg, [datasourceName, datasourceData]) => {
+				const datasource = datasourceData.datasource
+					? datasourceData.datasource
+					: defaultDatasource.datasourceApp
+					? doc(db, "users", user.uid, "apps", defaultDatasource.datasourceApp)
+					: null;
+
+				if (!datasource) return agg;
+
+				agg[datasourceName] = {
+					datasource: datasource,
+					datasourceQuery: datasourceData.datasourceQuery,
+				};
+
+				return agg;
+			}, {}),
 			position: data.position,
 		};
-
-		console.log("saving", id);
 
 		setDoc(widgetRef, widgetData, { merge: true })
 			.then(() => loadActiveLayout(true))

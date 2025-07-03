@@ -89,7 +89,6 @@ const Widget = (props: WidgetProps) => {
 					placerMode="NONE"
 				>
 					{widgetComponentLayout.components.map((component) => {
-						console.log("TYPE", "123", component.type);
 						const Component = widgetComponentRegistry[component.type];
 
 						return (

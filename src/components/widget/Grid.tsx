@@ -97,25 +97,17 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 	}, [widgets]);
 
 	useEffect(() => {
-		console.log(
-			"isSelectionInUnoccupiedSpace",
-			"setting occupied",
-			occupiedPositions
-		);
 		setOccupiedPositions(occupiedPositions);
 	}, [occupiedPositions]);
 
 	const fillers = [];
-	console.log(occupiedPositions);
 
 	for (let c = 1; c <= props.rows; c++) {
 		for (let r = 1; r <= props.columns; r++) {
-			console.log("OCCUPIEDD", occupiedPositions);
 			const isOccupied = occupiedPositions.some(
 				([row, col]) => row == r && col == c
 			);
 			if (!isOccupied) {
-				console.log("OCCUPIEDD", "PUSH");
 				fillers.push(
 					<Filler
 						key={`widget-filler-${r}-${c}`}

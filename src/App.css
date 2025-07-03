@@ -2,6 +2,10 @@ input {
   all: unset;
 }
 
+select {
+  all: unset;
+}
+
 .dashboard {
   height: 100%;
   width: 100%;
@@ -240,7 +244,8 @@ input {
   padding: 10%;
 }
 
-.input-form__form .input:not(:last-child) input {
+.input-form__form .input:not(:last-child) input,
+.input-form__form .input:not(:last-child) select {
   margin-bottom: 12px;
 }
 
@@ -257,10 +262,12 @@ input {
   padding-left: 2px;
 }
 
-.input input {
+.input input,
+.input select {
   border: 2px dotted black;
   border-radius: 0;
   padding: 4px 8px;
+  background-color: #fff;
 
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1em;
@@ -268,11 +275,14 @@ input {
 }
 
 .input input:focus,
-.input[data-hasValue="true"] input {
+.input[data-hasValue="true"] input,
+.input select:focus,
+.input[data-hasValue="true"] select {
   border-style: solid;
 }
 
-.input[data-hasValue="false"] input {
+.input[data-hasValue="false"] input,
+.input[data-hasValue="false"] select {
   border-style: dotted;
 }
 

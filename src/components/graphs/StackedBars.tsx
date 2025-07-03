@@ -48,8 +48,6 @@ const StackedBars = (props: StackedBarsProps) => {
 		) {
 			const normalizedData = normalizeStackedData(props.data);
 
-			console.log("STACKED", normalizedData);
-
 			const keys = Object.keys(normalizedData[0]).filter((k) => k !== "title");
 			const stackGenerator = d3.stack().keys(keys);
 			const stackedSeries = stackGenerator(normalizedData);

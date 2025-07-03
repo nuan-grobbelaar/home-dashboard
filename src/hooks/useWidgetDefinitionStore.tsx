@@ -33,9 +33,18 @@ export interface InsertField {
 
 export interface Query {
 	collection: string;
-	insert?: { [field: string]: InsertField };
 	groupBy?: QueryGroupBy;
 	target?: string;
+}
+
+export interface InsertQuery extends Query {
+	insert: { [field: string]: InsertField };
+}
+
+export interface WidgetDatasourceDefinition {
+	datasource?: DocumentReference;
+	datasourceApp?: string;
+	datasourceQuery: Query;
 }
 
 export interface WidgetComponentLayoutDefinition {
@@ -43,8 +52,7 @@ export interface WidgetComponentLayoutDefinition {
 	name: string;
 	rows: number;
 	columns: number;
-	datasourceApp: string;
-	datasourceQuery: Query;
+	datasources: { [datasourceName: string]: WidgetDatasourceDefinition };
 	widgetComponentDefinitions: WidgetComponentDefinition[];
 }
 

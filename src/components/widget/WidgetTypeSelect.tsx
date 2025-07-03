@@ -72,7 +72,7 @@ const WidgetTypeSelect = (props: WidgetTypeSelectProps) => {
 						</div>
 					);
 				} else {
-					console.log("error");
+					console.error("error");
 				}
 			}
 		}

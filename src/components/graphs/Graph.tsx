@@ -15,6 +15,16 @@ export interface GraphData {
 	color?: string;
 }
 
+export function isGraphData(value: any): value is GraphData {
+	return (
+		value && typeof value === "object" && "title" in value && "value" in value
+	);
+}
+
+export function isGraphDataArray(arr: any): arr is GraphData[] {
+	return Array.isArray(arr) && arr.every(isGraphData);
+}
+
 export interface GraphComponentProps {
 	data?: GraphData[];
 	height?: number;
@@ -77,7 +87,6 @@ const Graph = ({ data, children, margins = {} }: GraphProps) => {
 			.domain([0, yAxisMax])
 			.nice()
 			.range([height, 0]);
-		console.log("graph update", "setting x", xScaleBand);
 
 		const childrenArray = React.Children.toArray(children) as ReactElement[];
 

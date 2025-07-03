@@ -16,8 +16,6 @@ const Bars = (props: BarsProps) => {
 	const gRef = useRef<SVGGElement>(null);
 
 	useEffect(() => {
-		console.log("graph update", "ref", gRef.current);
-
 		if (
 			gRef.current &&
 			props.height &&
