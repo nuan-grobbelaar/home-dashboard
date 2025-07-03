@@ -4,7 +4,7 @@ export interface TextInputProps extends InputProps {}
 
 const TextInput = (props: TextInputProps) => {
 	return (
-		<div className="input" data-hasValue={props.value && props.value != ""}>
+		<div className="input" data-hasvalue={props.value && props.value != ""}>
 			<label htmlFor={props.id}>{props.id}</label>
 			<input
 				name={props.id}

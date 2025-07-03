@@ -6,6 +6,18 @@ select {
   all: unset;
 }
 
+.page-status {
+  color: #000;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0 12.5%;
+}
+
 .dashboard {
   height: 100%;
   width: 100%;
@@ -275,14 +287,14 @@ select {
 }
 
 .input input:focus,
-.input[data-hasValue="true"] input,
+.input[data-hasvalue="true"] input,
 .input select:focus,
-.input[data-hasValue="true"] select {
+.input[data-hasvalue="true"] select {
   border-style: solid;
 }
 
-.input[data-hasValue="false"] input,
-.input[data-hasValue="false"] select {
+.input[data-hasvalue="false"] input,
+.input[data-hasvalue="false"] select {
   border-style: dotted;
 }
 

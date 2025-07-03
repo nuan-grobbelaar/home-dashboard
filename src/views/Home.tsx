@@ -9,28 +9,32 @@ import Grid from "../components/widget-grid-infrastructure/Grid";
 import Widget, {
 	getWidgetId,
 } from "../components/widget-grid-infrastructure/Widget";
+import LoadingBar from "../components/widget-grid-infrastructure/LoadingBar";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
-	const [layoutsError, setLayoutsError] = useState<String | null>(null);
+	const [error, setError] = useState<String | null>(null);
 
 	const {
 		// user: firebaseUser,
 		loading: isFirebaseAuthLoading,
-		// error: firebaseAuthError,
-	} = useFirebaseAuth();
+	} = useFirebaseAuth(setError);
 
 	const { activeLayout, saveWidget, deleteWidget } = useWidgetGridStore(
 		setLoadingLayouts,
-		setLayoutsError
+		setError
 	);
 
-	if (isFirebaseAuthLoading || loadingLayouts) {
-		return <div>Loading...</div>;
+	if (error) {
+		return <div className="page-status">{error}</div>;
 	}
 
-	if (layoutsError) {
-		return <div>Error loading layouts: {layoutsError}</div>;
+	if (isFirebaseAuthLoading || loadingLayouts) {
+		return (
+			<div className="page-status">
+				<LoadingBar message="Loading Layout" />
+			</div>
+		);
 	}
 
 	return (

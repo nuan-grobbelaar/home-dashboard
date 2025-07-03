@@ -74,6 +74,7 @@ const InputForm = (props: InputFormProps) => {
 
 						return (
 							<FormInput
+								key={field}
 								id={field}
 								onInputChange={handleInputChange}
 								options={options}

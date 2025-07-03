@@ -13,11 +13,10 @@ interface Auth0ToFirebaseResponse {
 	firebaseToken: string;
 }
 
-export function useFirebaseAuth() {
+export function useFirebaseAuth(setError: (error: String | null) => void) {
 	const { getAccessTokenSilently } = useAuth0();
 	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<Error | null>(null);
 
 	const signInWithAuth0Token = useCallback(async (auth0Token: string) => {
 		if (!auth0Token) {
@@ -71,5 +70,5 @@ export function useFirebaseAuth() {
 		trySignIn();
 	}, [getAccessTokenSilently, signInWithAuth0Token]);
 
-	return { user, loading, error };
+	return { user, loading };
 }

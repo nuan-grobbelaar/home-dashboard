@@ -6,17 +6,17 @@ export interface SelectInputProps extends InputProps {
 
 const SelectInput = (props: SelectInputProps) => {
 	return (
-		<div className="input" data-hasValue={props.value && props.value != ""}>
+		<div className="input" data-hasvalue={props.value && props.value != ""}>
 			<label htmlFor={props.id}>{props.id}</label>
 			<select
 				name={props.id}
 				value={props.value ? props.value : ""}
 				onChange={(e) => props.onInputChange(props.id, e.target.value)}
 			>
-				<option value=""></option>
+				<option key="empty" value=""></option>
 				{props.options &&
 					props.options.map((option) => (
-						<option key={option.id} value={option.value}>
+						<option key={option.title} value={option.value}>
 							{option.title}
 						</option>
 					))}

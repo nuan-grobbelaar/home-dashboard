@@ -70,9 +70,9 @@ export function useWidgetStore(
 					}));
 				}
 			});
-		}, 5000);
+		}, 30000); // TODO: this should change based on user activity / which view is being loaded.
 		return () => clearInterval(interval);
-	}, [widget]);
+	}, []);
 
 	async function getWidgetComponentLayout(widgetRef: DocumentReference) {
 		const user = auth.currentUser;
@@ -292,15 +292,18 @@ export function useWidgetStore(
 		}
 	}
 
-	function loadWidgetComponentLayout() {
+	function loadWidgetComponentLayout(updateLoadingState: boolean = true) {
 		if (!widget.dbRef) return;
-		setLoading?.({
-			isLoading: true,
-			message: "Loading widget component layout",
-		});
+		if (updateLoadingState)
+			setLoading?.({
+				isLoading: true,
+				message: "Loading widget component layout",
+			});
 		getWidgetComponentLayout(widget.dbRef)
 			.then((wcl) => (wcl ? setWidgetComponentLayout(wcl) : null))
-			.finally(() => setLoading?.({ isLoading: false }));
+			.finally(() => {
+				if (updateLoadingState) setLoading?.({ isLoading: false });
+			});
 	}
 
 	return { widgetComponentLayout, widgetData, insertIntoWidgetDatasource };

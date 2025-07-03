@@ -9,8 +9,9 @@ const convertToFirestoreTimestamp = (date: Date) => {
 };
 
 const convertToFirestoreTimestampFromString = (dateString: string) => {
+	console.log("date update", dateString);
 	const date = new Date(dateString);
-	convertToFirestoreTimestamp(date);
+	return convertToFirestoreTimestamp(date);
 };
 
 const convertToDateTimeString = (firestoreTimestamp: Timestamp) => {
@@ -25,7 +26,7 @@ const DateInput = (props: DateInputProps) => {
 	}, []);
 
 	return (
-		<div className="input" data-hasValue={props.value && props.value != ""}>
+		<div className="input" data-hasvalue={props.value && props.value != ""}>
 			<label htmlFor={props.id}>{props.id}</label>
 			<input
 				name={props.id}
