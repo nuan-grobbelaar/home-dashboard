@@ -61,12 +61,17 @@ export function useWidgetStore(
 		loadWidgetComponentLayout();
 
 		loadWidgetDataFromDatasources();
-		// const interval = setInterval(() => {
-		// 	loadWidgetDataFromDatasource("default").then((data) => {
-		// 		if (data) setWidgetData({ ...widgetData, default: data }); //TODO: race condition
-		// 	});
-		// }, 5000);
-		// return () => clearInterval(interval);
+		const interval = setInterval(() => {
+			loadWidgetDataFromDatasource("default").then((data) => {
+				if (data) {
+					setWidgetData((prev) => ({
+						...prev,
+						default: data,
+					}));
+				}
+			});
+		}, 5000);
+		return () => clearInterval(interval);
 	}, [widget]);
 
 	async function getWidgetComponentLayout(widgetRef: DocumentReference) {
@@ -272,18 +277,19 @@ export function useWidgetStore(
 
 	function loadWidgetDataFromDatasources() {
 		if (!widget.datasources) return;
-		const datasources: WidgetDatasourceQueryResponseData = {};
 		for (const datasourceName of Object.keys(widget.datasources)) {
 			loadWidgetDataFromDatasource(datasourceName).then((data) => {
-				if (data) datasources[datasourceName] = data;
+				if (data)
+					setWidgetData((prev) => ({
+						...prev,
+						[datasourceName]: data,
+					}));
 				else
 					console.warn(
 						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
 					);
 			});
 		}
-
-		setWidgetData(datasources);
 	}
 
 	function loadWidgetComponentLayout() {

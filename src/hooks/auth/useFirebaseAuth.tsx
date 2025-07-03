@@ -29,18 +29,17 @@ export function useFirebaseAuth() {
 		setError(null);
 
 		try {
+			console.log("trying");
 			const auth0ToFirebase = httpsCallable<
 				Auth0ToFirebaseRequest,
 				Auth0ToFirebaseResponse
 			>(functions, "auth0ToFirebase");
 
-			// Call your cloud function with the Auth0 token
 			const result: { data: Auth0ToFirebaseResponse } = await auth0ToFirebase({
 				token: auth0Token,
 			});
 			const firebaseToken = result.data.firebaseToken;
 
-			// Sign in to Firebase with the custom token
 			const firebaseUserCredential = await signInWithCustomToken(
 				auth,
 				firebaseToken
@@ -48,6 +47,7 @@ export function useFirebaseAuth() {
 
 			setUser(firebaseUserCredential.user);
 		} catch (err: any) {
+			console.log(err);
 			setError(err);
 			setUser(null);
 		} finally {
@@ -55,30 +55,20 @@ export function useFirebaseAuth() {
 		}
 	}, []);
 
-	// Call it whenever auth0Token changes
 	useEffect(() => {
-		let isMounted = true;
-
 		const trySignIn = async () => {
 			try {
 				const auth0Token = await getAccessTokenSilently();
-				if (isMounted && auth0Token) {
+				if (auth0Token) {
+					console.log("auth token");
 					await signInWithAuth0Token(auth0Token);
 				}
 			} catch (err) {
 				console.error("Auth0 token retrieval failed", err);
-				if (isMounted) {
-					setError(err as Error);
-					setUser(null);
-				}
 			}
 		};
 
 		trySignIn();
-
-		return () => {
-			isMounted = false;
-		};
 	}, [getAccessTokenSilently, signInWithAuth0Token]);
 
 	return { user, loading, error };

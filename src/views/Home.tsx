@@ -1,7 +1,3 @@
-import Grid from "../components/widget-grid-infrastructure/Grid";
-import Widget, {
-	getWidgetId,
-} from "../components/widget-grid-infrastructure/Widget";
 import { useState } from "react";
 import { useWidgetGridStore } from "../hooks/firestore/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/auth/useFirebaseAuth";
@@ -9,6 +5,10 @@ import type {
 	WidgetCreationData,
 	WidgetDocument,
 } from "../hooks/firestore/types";
+import Grid from "../components/widget-grid-infrastructure/Grid";
+import Widget, {
+	getWidgetId,
+} from "../components/widget-grid-infrastructure/Widget";
 
 const Home = () => {
 	const [loadingLayouts, setLoadingLayouts] = useState(true);
