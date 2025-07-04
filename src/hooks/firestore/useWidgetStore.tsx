@@ -11,7 +11,7 @@ import {
 import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
 import Barchart from "../../components/widget-components/Barchart";
-import type { WidgetLoading } from "../../components/widget-grid-infrastructure/Widget";
+import type { LoadingState } from "../../components/widget-grid-infrastructure/Widget";
 import InputForm from "../../components/widget-components/InputForm";
 import {
 	isInsertQuery,
@@ -49,7 +49,7 @@ export const widgetComponentRegistry: Record<
 
 export function useWidgetStore(
 	widget: WidgetDocument,
-	setLoading?: (loading: WidgetLoading) => void
+	setLoading?: (loading: LoadingState) => void
 	// setError?: (error: String | null) => void
 ) {
 	const [widgetComponentLayout, setWidgetComponentLayout] =
@@ -199,7 +199,6 @@ export function useWidgetStore(
 	}
 
 	async function queryWidgetDatasource(
-		datasourceName: string,
 		datasource: DocumentReference,
 		datasourceQuery: Query
 	) {
@@ -256,11 +255,7 @@ export function useWidgetStore(
 
 		if (datasource && datasourceQuery) {
 			if (datasourceQuery.groupBy && datasourceQuery.target) {
-				return await queryWidgetDatasource(
-					datasourceName,
-					datasource,
-					datasourceQuery
-				);
+				return await queryWidgetDatasource(datasource, datasourceQuery);
 			} else if (isInsertQuery(datasourceQuery)) {
 				return datasourceQuery;
 			} else {

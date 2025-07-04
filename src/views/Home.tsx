@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWidgetGridStore } from "../hooks/firestore/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/auth/useFirebaseAuth";
 import type {
@@ -8,31 +8,28 @@ import type {
 import Grid from "../components/widget-grid-infrastructure/Grid";
 import Widget, {
 	getWidgetId,
+	type LoadingState,
 } from "../components/widget-grid-infrastructure/Widget";
 import LoadingBar from "../components/widget-grid-infrastructure/LoadingBar";
 
-const Home = () => {
-	const [loadingLayouts, setLoadingLayouts] = useState(true);
-	const [error, setError] = useState<String | null>(null);
+export interface HomeProps {
+	isLoading: LoadingState;
+	setLoading: (loading: LoadingState) => void;
+	setError: (error: String | null) => void;
+}
 
-	const {
-		// user: firebaseUser,
-		loading: isFirebaseAuthLoading,
-	} = useFirebaseAuth(setError);
+const Home = ({ isLoading, setError, setLoading }: HomeProps) => {
+	useFirebaseAuth(setError);
 
 	const { activeLayout, saveWidget, deleteWidget } = useWidgetGridStore(
-		setLoadingLayouts,
+		setLoading,
 		setError
 	);
 
-	if (error) {
-		return <div className="page-status">{error}</div>;
-	}
-
-	if (isFirebaseAuthLoading || loadingLayouts) {
+	if (isLoading.isLoading) {
 		return (
 			<div className="page-status">
-				<LoadingBar message="Loading Layout" />
+				<LoadingBar message={isLoading.message} />
 			</div>
 		);
 	}

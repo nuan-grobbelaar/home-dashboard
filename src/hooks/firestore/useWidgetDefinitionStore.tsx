@@ -1,7 +1,7 @@
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
-import type { WidgetLoading } from "../../components/widget-grid-infrastructure/Widget";
+import type { LoadingState } from "../../components/widget-grid-infrastructure/Widget";
 import type {
 	WidgetComponentDefinitionDocument,
 	WidgetComponentLayoutDefinitionDocument,
@@ -10,8 +10,8 @@ import type {
 
 export function useWidgetDefinitionStore(
 	auto: boolean = true,
-	setLoading?: (loading: WidgetLoading) => void
-	// setError?: (error: String | null) => void
+	setLoading?: (loading: LoadingState) => void,
+	setError?: (error: String | null) => void
 ) {
 	const db = getFirestore();
 

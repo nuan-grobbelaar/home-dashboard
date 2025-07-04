@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FillerProps } from "../../components/widget-grid-infrastructure/Filler";
-import type { WidgetLoading } from "../../components/widget-grid-infrastructure/Widget";
+import type { LoadingState } from "../../components/widget-grid-infrastructure/Widget";
 
 export interface GridItemPosition {
 	colStart: number;
@@ -12,7 +12,7 @@ export interface GridItemPosition {
 export interface GridItem {
 	position: GridItemPosition;
 	unsaved?: boolean;
-	isLoading?: WidgetLoading;
+	isLoading?: LoadingState;
 	editMode?: boolean;
 	onSave?: (item: any) => void;
 	removeItem?: (id?: string) => void;

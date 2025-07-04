@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 export interface LoadingBarProps {
 	message?: string;
@@ -6,7 +6,7 @@ export interface LoadingBarProps {
 
 const LoadingBar = (props: LoadingBarProps) => {
 	const progressBarRef = useRef<HTMLDivElement | null>(null);
-	const timeoutRef = useRef<number>(null);
+	// const timeoutRef = useRef<number>(null);
 
 	// const smoothRandomBounce = (): void => {
 	// 	if (!progressBarRef.current) return;

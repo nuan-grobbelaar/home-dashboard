@@ -25,10 +25,8 @@ export function useFirebaseAuth(setError: (error: String | null) => void) {
 		}
 
 		setLoading(true);
-		setError(null);
 
 		try {
-			console.log("trying");
 			const auth0ToFirebase = httpsCallable<
 				Auth0ToFirebaseRequest,
 				Auth0ToFirebaseResponse
@@ -59,7 +57,6 @@ export function useFirebaseAuth(setError: (error: String | null) => void) {
 			try {
 				const auth0Token = await getAccessTokenSilently();
 				if (auth0Token) {
-					console.log("auth token");
 					await signInWithAuth0Token(auth0Token);
 				}
 			} catch (err) {

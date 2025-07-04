@@ -17,25 +17,37 @@ import type {
 	WidgetDocument,
 	WidgetLayoutDocument,
 } from "./types";
+import type { LoadingState } from "../../components/widget-grid-infrastructure/Widget";
+import { onAuthStateChanged, type User } from "firebase/auth";
 
 export function useWidgetGridStore(
-	setLoading: (isLoading: boolean) => void,
+	setLoading: (loading: LoadingState) => void,
 	setError: (error: String | null) => void
 ) {
 	const db = getFirestore();
 
-	// const [layouts, setLayouts] = useState<Layout[]>([]);
 	const [activeLayout, setActiveLayout] = useState<WidgetLayoutDocument | null>(
 		null
 	);
 
+	const [user, setUser] = useState<User | null>(null);
+
 	useEffect(() => {
-		loadActiveLayout();
+		const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+			setUser(currentUser);
+		});
+
+		return () => unsubscribe();
 	}, []);
+
+	useEffect(() => {
+		console.log("USER", user);
+		if (user) loadActiveLayout();
+	}, [user?.uid]);
 
 	async function getWidgets(layoutId: string) {
 		const user = auth.currentUser;
-		if (!user) return Promise.reject(new Error("Not authenticated"));
+		if (!user) return Promise.reject(new Error("Not authenticated 1"));
 
 		const layoutWidgetsRef = collection(
 			db,
@@ -72,13 +84,12 @@ export function useWidgetGridStore(
 	}
 
 	function loadActiveLayout(silent?: boolean) {
-		const user = auth.currentUser;
 		if (!user) {
-			setError("Not Authenticated");
-			throw new Error("Not Authenticated");
+			setError("Not Authenticated 2");
+			return;
 		}
 
-		if (!silent) setLoading(true);
+		if (!silent) setLoading({ isLoading: true, message: "Loading layout" });
 
 		const activeLayoutRef = collection(db, "users", user.uid, "widget-layouts");
 		const q = query(activeLayoutRef, where("active", "==", true));
@@ -102,16 +113,17 @@ export function useWidgetGridStore(
 			})
 			.catch((err) => {
 				setError(err.message || String(err));
-				throw err;
 			})
 			.finally(() => {
-				if (!silent) setLoading(false);
+				if (!silent) setLoading({ isLoading: false });
 			});
 	}
 
 	function saveWidget(layoutId: string, widget: WidgetCreationData) {
-		const user = auth.currentUser;
-		if (!user) throw new Error("Not authenticated");
+		if (!user) {
+			setError("Not authenticated 3");
+			return;
+		}
 
 		const widgetRef = doc(
 			collection(db, "users", user.uid, "widget-layouts", layoutId, "widgets")
@@ -160,8 +172,10 @@ export function useWidgetGridStore(
 	}
 
 	function deleteWidget(layoutId: string, widgetId: string) {
-		const user = auth.currentUser;
-		if (!user) throw new Error("Not authenticated");
+		if (!user) {
+			setError("Not authenticated 4");
+			return;
+		}
 
 		const widgetRef = doc(
 			db,
@@ -182,8 +196,10 @@ export function useWidgetGridStore(
 	}
 
 	function saveLayout(layout: WidgetLayoutDocument) {
-		const user = auth.currentUser;
-		if (!user) throw new Error("Not authenticated");
+		if (!user) {
+			setError("Not authenticated 5");
+			return;
+		}
 
 		const layoutId = layout.id || crypto.randomUUID();
 

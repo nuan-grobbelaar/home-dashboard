@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type PropsWithChildren,
+} from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
 import type { GridItem } from "../../hooks/grid/useGridItemPlacer";
 import Grid from "./Grid";
@@ -16,7 +22,7 @@ export interface WidgetProps
 		GridItem,
 		PropsWithChildren {}
 
-export interface WidgetLoading {
+export interface LoadingState {
 	isLoading: boolean;
 	message?: string;
 }
@@ -26,7 +32,7 @@ export const getWidgetId = (props: WidgetProps) => {
 };
 
 const Widget = (props: WidgetProps) => {
-	const [loading, setLoading] = useState<WidgetLoading>({
+	const [loading, setLoading] = useState<LoadingState>({
 		isLoading: !!props.isLoading,
 	});
 	const isLoading = useMemo(() => {
