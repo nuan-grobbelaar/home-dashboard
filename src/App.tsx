@@ -3,10 +3,20 @@ import "./App.css";
 import "./fonts.css";
 import Home from "./views/Home";
 import { useAuth0 } from "@auth0/auth0-react";
-import LoadingBar from "./components/widget-grid-infrastructure/LoadingBar";
 import type { LoadingState } from "./components/widget-grid-infrastructure/Widget";
-import LoginButton from "./components/auth/LoginButton";
-import LogoutButton from "./components/auth/LogoutButton";
+
+function isMobileDevice() {
+	return (
+		navigator.userAgent.includes("IEMobile") ||
+		/android|iphone|ipad|ipod|blackberry|bb10|mini|windows\sce|palm/i.test(
+			navigator.userAgent
+		)
+	);
+}
+
+function isMobileViewport() {
+	return window.matchMedia("(max-width: 767px)").matches;
+}
 
 function App() {
 	const {
@@ -24,6 +34,7 @@ function App() {
 
 	const [error, _setError] = useState<String | null>(null);
 	const setError = useCallback((e: String | null) => {
+		console.log("ERROR", error);
 		_setError(e);
 	}, []);
 
@@ -51,8 +62,15 @@ function App() {
 		return <div className="page-status">{error}</div>;
 	}
 
+	const isOnMobileDevice = isMobileDevice() || isMobileViewport();
+
 	return (
-		<Home isLoading={isLoading} setError={setError} setLoading={setLoading} />
+		<Home
+			isLoading={isLoading}
+			setError={setError}
+			setLoading={setLoading}
+			isMobile={isOnMobileDevice}
+		/>
 	);
 }
 

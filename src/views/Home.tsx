@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
 import { useWidgetGridStore } from "../hooks/firestore/useWidgetGridStore";
 import { useFirebaseAuth } from "../hooks/auth/useFirebaseAuth";
 import type {
@@ -16,9 +15,10 @@ export interface HomeProps {
 	isLoading: LoadingState;
 	setLoading: (loading: LoadingState) => void;
 	setError: (error: String | null) => void;
+	isMobile: boolean;
 }
 
-const Home = ({ isLoading, setError, setLoading }: HomeProps) => {
+const Home = ({ isLoading, setError, setLoading, isMobile }: HomeProps) => {
 	useFirebaseAuth(setError);
 
 	const { activeLayout, saveWidget, deleteWidget } = useWidgetGridStore(
@@ -45,6 +45,8 @@ const Home = ({ isLoading, setError, setLoading }: HomeProps) => {
 					onSaveGridItem={(item: WidgetCreationData) => {
 						saveWidget(activeLayout.id, item);
 					}}
+					setError={setError}
+					editMode={!isMobile}
 				>
 					{activeLayout.widgets.map((widget: WidgetDocument) => (
 						<Widget
@@ -53,8 +55,8 @@ const Home = ({ isLoading, setError, setLoading }: HomeProps) => {
 							removeItem={(id?: string) =>
 								id ? deleteWidget(activeLayout.id, id) : null
 							}
-							editMode={true}
 							dbRef={widget.dbRef}
+							setError={setError}
 						>
 							{widget.type}
 						</Widget>

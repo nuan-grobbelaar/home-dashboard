@@ -49,8 +49,8 @@ export const widgetComponentRegistry: Record<
 
 export function useWidgetStore(
 	widget: WidgetDocument,
-	setLoading?: (loading: LoadingState) => void
-	// setError?: (error: String | null) => void
+	setLoading: (loading: LoadingState) => void,
+	setError?: (error: String | null) => void
 ) {
 	const [widgetComponentLayout, setWidgetComponentLayout] =
 		useState<WidgetComponentLayoutDocument>();
@@ -113,12 +113,12 @@ export function useWidgetStore(
 
 				return layout;
 			} else {
-				console.error(
+				throw new Error(
 					`No component layout found with ref: ${componentLayoutRef.path}`
 				);
 			}
 		} else {
-			console.error(`No widgets found with ref: ${widget.dbRef}`);
+			throw new Error(`No widgets found with ref: ${widget.dbRef?.path}`);
 		}
 	}
 
@@ -203,9 +203,7 @@ export function useWidgetStore(
 		datasourceQuery: Query
 	) {
 		const user = auth.currentUser;
-		if (!user) return Promise.reject(new Error("Not authenticated"));
-
-		if (!datasource || !datasourceQuery) return Promise.reject(); //remove later
+		if (!user) throw new Error("Not authenticated");
 
 		const datasourceCollectionRef = collection(
 			datasource,
@@ -253,20 +251,24 @@ export function useWidgetStore(
 
 		const { datasource, datasourceQuery } = widget.datasources[datasourceName];
 
-		if (datasource && datasourceQuery) {
-			if (datasourceQuery.groupBy && datasourceQuery.target) {
-				return await queryWidgetDatasource(datasource, datasourceQuery);
-			} else if (isInsertQuery(datasourceQuery)) {
-				return datasourceQuery;
+		try {
+			if (datasource && datasourceQuery) {
+				if (datasourceQuery.groupBy && datasourceQuery.target) {
+					return await queryWidgetDatasource(datasource, datasourceQuery);
+				} else if (isInsertQuery(datasourceQuery)) {
+					return datasourceQuery;
+				} else {
+					console.warn(
+						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
+					);
+				}
 			} else {
 				console.warn(
-					`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
+					`No datasource defined for widget ${widget.id} with name: ${datasourceName}`
 				);
 			}
-		} else {
-			console.warn(
-				`No datasource defined for widget ${widget.id} with name: ${datasourceName}`
-			);
+		} catch (e: any) {
+			setError?.(e.message);
 		}
 	}
 
@@ -296,6 +298,7 @@ export function useWidgetStore(
 			});
 		getWidgetComponentLayout(widget.dbRef)
 			.then((wcl) => (wcl ? setWidgetComponentLayout(wcl) : null))
+			.catch((e) => setError?.(e.message))
 			.finally(() => {
 				if (updateLoadingState) setLoading?.({ isLoading: false });
 			});

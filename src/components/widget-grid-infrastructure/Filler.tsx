@@ -3,6 +3,7 @@ export interface FillerProps {
 	row: number;
 	column: number;
 	selected?: boolean;
+	active: boolean;
 	handleMouseDown: (filler: FillerProps, e: React.MouseEvent) => void;
 	handleMouseEnter: (filler: FillerProps, e: React.MouseEvent) => void;
 }
@@ -12,8 +13,17 @@ const Filler = (props: FillerProps) => {
 		<div
 			className="widget-grid__filler"
 			data-selected={props.selected}
-			onMouseDown={(e: React.MouseEvent) => props.handleMouseDown(props, e)}
-			onMouseEnter={(e: React.MouseEvent) => props.handleMouseEnter(props, e)}
+			data-active={props.active}
+			onMouseDown={
+				props.active
+					? (e: React.MouseEvent) => props.handleMouseDown(props, e)
+					: () => {}
+			}
+			onMouseEnter={
+				props.active
+					? (e: React.MouseEvent) => props.handleMouseEnter(props, e)
+					: () => {}
+			}
 		>
 			{/* {`[${props.row}, ${props.column}] ${props.selected ? "S" : ""}`} */}
 		</div>

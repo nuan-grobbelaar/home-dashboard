@@ -1,10 +1,4 @@
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-	type PropsWithChildren,
-} from "react";
+import { useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import WidgetTypeSelect from "./WidgetTypeSelect";
 import type { GridItem } from "../../hooks/grid/useGridItemPlacer";
 import Grid from "./Grid";
@@ -20,7 +14,9 @@ import type { WidgetDocument } from "../../hooks/firestore/types";
 export interface WidgetProps
 	extends WidgetDocument,
 		GridItem,
-		PropsWithChildren {}
+		PropsWithChildren {
+	setError?: (error: String | null) => void;
+}
 
 export interface LoadingState {
 	isLoading: boolean;
@@ -42,11 +38,12 @@ const Widget = (props: WidgetProps) => {
 	}, [loading, props.isLoading]);
 
 	const { widgetComponentLayout, widgetData, insertIntoWidgetDatasource } =
-		useWidgetStore(props, setLoading);
+		useWidgetStore(props, setLoading, props.setError);
 
 	const { loadWidgetDefinitions, widgetDefinitions } = useWidgetDefinitionStore(
 		false,
-		setLoading
+		setLoading,
+		props.setError
 	);
 
 	useEffect(() => {

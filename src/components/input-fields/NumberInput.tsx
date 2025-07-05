@@ -7,6 +7,7 @@ const NumberInput = (props: NumberInputProps) => {
 		<div className="input" data-hasvalue={props.value && props.value != ""}>
 			<label htmlFor={props.id}>{props.id}</label>
 			<input
+				className="input-text"
 				name={props.id}
 				type="number"
 				step=".01"

@@ -11,8 +11,9 @@ interface GridProps<P extends GridItem> extends PropsWithChildren {
 	columns: number;
 	rows: number;
 	placerMode?: PlacerMode;
+	editMode?: boolean;
 	onSaveGridItem: (item: P) => void;
-
+	setError?: (error: String | null) => void;
 	ItemComponent: React.ComponentType<P>;
 }
 
@@ -49,9 +50,11 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 		const childrenArray = React.Children.toArray(
 			props.children
 		) as ReactElement[];
-		const baseWidgets = childrenArray.filter(
-			(c): c is ReactElement<P> => c.type === props.ItemComponent
-		);
+		const baseWidgets = childrenArray
+			.filter((c): c is ReactElement<P> => c.type === props.ItemComponent)
+			.map((c) =>
+				React.cloneElement(c, { ...c.props, editMode: props.editMode })
+			);
 
 		if (childrenArray.length > baseWidgets.length)
 			console.error(
@@ -69,6 +72,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 					removeItem={removePlacedItem}
 					onSave={onSaveGridItem}
 					key="unsaved"
+					setError={props.setError}
 				/>,
 			];
 		}
@@ -119,6 +123,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 								(props) => props.row === r && props.column === c
 							)
 						}
+						active={props.editMode ?? false}
 						handleMouseDown={handleMouseDown}
 						handleMouseEnter={handleMouseEnter}
 					/>

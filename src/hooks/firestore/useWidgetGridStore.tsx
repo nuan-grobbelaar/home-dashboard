@@ -47,7 +47,7 @@ export function useWidgetGridStore(
 
 	async function getWidgets(layoutId: string) {
 		const user = auth.currentUser;
-		if (!user) return Promise.reject(new Error("Not authenticated 1"));
+		if (!user) return Promise.reject(new Error("Not authenticated"));
 
 		const layoutWidgetsRef = collection(
 			db,
@@ -85,7 +85,7 @@ export function useWidgetGridStore(
 
 	function loadActiveLayout(silent?: boolean) {
 		if (!user) {
-			setError("Not Authenticated 2");
+			setError("Not Authenticated");
 			return;
 		}
 
@@ -121,7 +121,7 @@ export function useWidgetGridStore(
 
 	function saveWidget(layoutId: string, widget: WidgetCreationData) {
 		if (!user) {
-			setError("Not authenticated 3");
+			setError("Not authenticated");
 			return;
 		}
 
@@ -173,7 +173,7 @@ export function useWidgetGridStore(
 
 	function deleteWidget(layoutId: string, widgetId: string) {
 		if (!user) {
-			setError("Not authenticated 4");
+			setError("Not authenticated");
 			return;
 		}
 
@@ -197,7 +197,7 @@ export function useWidgetGridStore(
 
 	function saveLayout(layout: WidgetLayoutDocument) {
 		if (!user) {
-			setError("Not authenticated 5");
+			setError("Not authenticated");
 			return;
 		}
 

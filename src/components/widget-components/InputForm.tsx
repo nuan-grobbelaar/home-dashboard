@@ -17,6 +17,7 @@ export interface InputFormProps {
 export interface InputProps {
 	id: string;
 	value: any;
+	label?: boolean;
 	onInputChange: (id: string, value: any) => void;
 }
 
@@ -83,7 +84,9 @@ const InputForm = (props: InputFormProps) => {
 						);
 					})}
 
-				<button type="submit">Submit</button>
+				<button type="submit" className="input-form__form-submit-button">
+					Submit
+				</button>
 			</form>
 		</div>
 	);
