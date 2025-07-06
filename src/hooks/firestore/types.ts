@@ -83,10 +83,12 @@ export interface InsertField {
 	type: InputType;
 	required: boolean;
 	datasource?: string;
+	order?: number;
 }
 
 export interface Query {
 	collection: string;
+	where?: Array<WhereClause>;
 	groupBy?: QueryGroupBy;
 	target?: string;
 }
@@ -95,6 +97,12 @@ export interface QueryGroupBy {
 	field: string;
 	granularity?: string;
 	then?: QueryGroupBy;
+}
+
+export interface WhereClause {
+	field: string;
+	operator: ">" | ">=" | "==" | "<" | "<=";
+	value: any;
 }
 
 export interface InsertQuery extends Query {

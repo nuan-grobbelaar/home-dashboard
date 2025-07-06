@@ -32,6 +32,11 @@ select {
   padding: 16px;
 }
 
+.dashboard[data-mobile="true"] {
+  height: auto;
+  padding: 8px;
+}
+
 .widget-grid {
   display: grid;
   /* height: calc(100% - 32px);
@@ -91,6 +96,10 @@ select {
   color: black;
   width: 100%;
   height: 100%;
+}
+
+.widget-grid__filler[data-mobile="true"] {
+  aspect-ratio: 1 / 1;
 }
 
 .widget-grid__filler[data-active="true"] {

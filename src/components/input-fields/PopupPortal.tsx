@@ -2,44 +2,41 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface PopupPortalProps {
-	anchorRef: React.RefObject<HTMLElement>;
+	anchorRef: React.RefObject<HTMLInputElement | null>;
 	visible: boolean;
 	children: React.ReactNode;
 }
 
-const PopupPortal: React.FC<PopupPortalProps> = ({
-	anchorRef,
-	visible,
-	children,
-}) => {
+const PopupPortal = ({ anchorRef, visible, children }: PopupPortalProps) => {
 	const popupRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		function updatePosition() {
-			const anchor = anchorRef.current;
-			const popup = popupRef.current;
+		const popup = popupRef.current;
+		const anchor = anchorRef.current;
 
-			if (anchor && popup) {
+		function updatePosition() {
+			if (popup && anchor) {
 				const rect = anchor.getBoundingClientRect();
-				popup.style.position = "fixed";
-				popup.style.top = `${rect.bottom}px`;
-				popup.style.left = `${rect.left}px`;
+				const scrollY = window.scrollY || document.documentElement.scrollTop;
+				const scrollX = window.scrollX || document.documentElement.scrollLeft;
+
+				popup.style.position = "absolute";
+				popup.style.top = `${rect.bottom + scrollY}px`;
+				popup.style.left = `${rect.left + scrollX}px`;
 				popup.style.width = `${rect.width}px`;
-				popup.style.zIndex = "1000";
 			}
 		}
 
-		if (visible) {
-			updatePosition();
-			window.addEventListener("resize", updatePosition);
-			window.addEventListener("scroll", updatePosition, true);
-		}
+		updatePosition();
+
+		window.addEventListener("scroll", updatePosition, true);
+		window.addEventListener("resize", updatePosition);
 
 		return () => {
-			window.removeEventListener("resize", updatePosition);
 			window.removeEventListener("scroll", updatePosition, true);
+			window.removeEventListener("resize", updatePosition);
 		};
-	}, [visible, anchorRef]);
+	}, [anchorRef, visible]);
 
 	if (!visible) return null;
 

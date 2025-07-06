@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import type { InputProps } from "../widget-components/InputForm";
 import PopupPortal from "./PopupPortal";
-import TextInput from "./TextInput";
 import ChevronUpIcon from "../../icons/ChevronUpIcon";
 import ChevronDownIcon from "../../icons/ChevronDownIcon";
 
@@ -32,39 +31,28 @@ const SelectInput = (props: SelectInputProps) => {
 						name={props.id}
 						type="text"
 						value={props.value ? props.value : ""}
+						readOnly
 						// onChange={(e) => props.onInputChange(props.id, e.target.value)}
 					/>
 					<button className="action-button">
 						{dropdownOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
 					</button>
 				</div>
-				{/* <div className="popup"></div> */}
-				{/* <select
-				name={props.id}
-				value={props.value ? props.value : ""}
-				onChange={(e) => props.onInputChange(props.id, e.target.value)}
-			>
-				<option key="empty" value=""></option>
-				{props.options &&
-					props.options.map((option) => (
-						<option key={option.title} value={option.value}>
-							{option.title}
-						</option>
-					))}
-			</select> */}
 			</div>
-			<PopupPortal anchorRef={inputRef} visible={dropdownOpen}>
-				{props.options &&
-					props.options.map((option) => (
-						<div
-							key={option.title}
-							className="input-select__option"
-							onClick={() => onInputChange(props.id, option.value)}
-						>
-							{option.title}
-						</div>
-					))}
-			</PopupPortal>
+			{inputRef && (
+				<PopupPortal anchorRef={inputRef} visible={dropdownOpen}>
+					{props.options &&
+						props.options.map((option) => (
+							<div
+								key={option.title}
+								className="input-select__option"
+								onClick={() => onInputChange(props.id, option.value)}
+							>
+								{option.title}
+							</div>
+						))}
+				</PopupPortal>
+			)}
 		</>
 	);
 };

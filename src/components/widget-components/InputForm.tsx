@@ -58,6 +58,8 @@ const InputForm = (props: InputFormProps) => {
 		setFormData({});
 	};
 
+	console.log("inputs", insertQuery.insert);
+
 	return (
 		<div className="input-form">
 			<form
@@ -66,23 +68,27 @@ const InputForm = (props: InputFormProps) => {
 				autoComplete="off"
 			>
 				{insertQuery.insert &&
-					Object.entries(insertQuery.insert).map(([field, properties]) => {
-						const FormInput = widgetComponentRegistry[properties.type];
-						const options =
-							properties.type == "select" && properties.datasource
-								? props.data[properties.datasource]
-								: null;
+					Object.entries(insertQuery.insert)
+						.sort(([_a, { order: orderA }], [_b, { order: orderB }]) =>
+							orderA && orderB ? orderA - orderB : 0
+						)
+						.map(([field, properties]) => {
+							const FormInput = widgetComponentRegistry[properties.type];
+							const options =
+								properties.type == "select" && properties.datasource
+									? props.data[properties.datasource]
+									: null;
 
-						return (
-							<FormInput
-								key={field}
-								id={field}
-								onInputChange={handleInputChange}
-								options={options}
-								value={formData[field]}
-							/>
-						);
-					})}
+							return (
+								<FormInput
+									key={field}
+									id={field}
+									onInputChange={handleInputChange}
+									options={options}
+									value={formData[field]}
+								/>
+							);
+						})}
 
 				<button type="submit" className="input-form__form-submit-button">
 					Submit

@@ -7,6 +7,10 @@ import {
 	Timestamp,
 	setDoc,
 	doc,
+	query,
+	where,
+	CollectionReference,
+	QueryFieldFilterConstraint,
 } from "firebase/firestore";
 import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
@@ -18,6 +22,7 @@ import {
 	type ComponentName,
 	type Query,
 	type QueryGroupBy,
+	type WhereClause,
 	type WidgetComponentDocument,
 	type WidgetComponentLayoutDocument,
 	type WidgetDatasourceQueryResponseData,
@@ -198,6 +203,29 @@ export function useWidgetStore(
 		return sortedAggregatedData;
 	}
 
+	function buildQuery(
+		collectionRef: CollectionReference,
+		datasourceQuery: Query
+	) {
+		if (!datasourceQuery.where) return collectionRef;
+
+		const whereClauses: Array<QueryFieldFilterConstraint> = [];
+
+		for (const wc of datasourceQuery.where) {
+			// Special case
+			if (wc.value == "currentMonth") {
+				const now = new Date();
+				const start = new Date(now.getFullYear(), now.getMonth(), 1);
+				const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+				whereClauses.push(where("timestamp", ">=", start));
+				whereClauses.push(where("timestamp", "<", end));
+			} else whereClauses.push(where(wc.field, wc.operator, wc.value));
+		}
+
+		return query(collectionRef, ...whereClauses);
+	}
+
 	async function queryWidgetDatasource(
 		datasource: DocumentReference,
 		datasourceQuery: Query
@@ -210,7 +238,9 @@ export function useWidgetStore(
 			datasourceQuery.collection
 		);
 
-		const dataSnapshot = await getDocs(datasourceCollectionRef);
+		const q = buildQuery(datasourceCollectionRef, datasourceQuery);
+
+		const dataSnapshot = await getDocs(q);
 
 		if (!dataSnapshot.empty) {
 			const rawData = dataSnapshot.docs.map((d) => d.data());

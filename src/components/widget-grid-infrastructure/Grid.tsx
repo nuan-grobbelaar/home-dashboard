@@ -11,6 +11,7 @@ interface GridProps<P extends GridItem> extends PropsWithChildren {
 	columns: number;
 	rows: number;
 	placerMode?: PlacerMode;
+	mobile?: boolean;
 	editMode?: boolean;
 	onSaveGridItem: (item: P) => void;
 	setError?: (error: String | null) => void;
@@ -123,6 +124,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 								(props) => props.row === r && props.column === c
 							)
 						}
+						mobile={props.mobile}
 						active={props.editMode ?? false}
 						handleMouseDown={handleMouseDown}
 						handleMouseEnter={handleMouseEnter}

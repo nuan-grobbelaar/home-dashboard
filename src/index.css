@@ -26,6 +26,13 @@ body {
   width: 100%;
   margin: 0 auto;
   text-align: center;
+
+  overflow-y: scroll;
+
+  /* Firefox */
+  scrollbar-width: none;
+  /* Internet Explorer and Edge */
+  -ms-overflow-style: none;
 }
 
 body {

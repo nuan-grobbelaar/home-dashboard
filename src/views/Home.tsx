@@ -35,7 +35,7 @@ const Home = ({ isLoading, setError, setLoading, isMobile }: HomeProps) => {
 	}
 
 	return (
-		<div className="dashboard">
+		<div className="dashboard" data-mobile={isMobile}>
 			{/* <LogoutButton /> */}
 			{activeLayout && (
 				<Grid
@@ -46,6 +46,7 @@ const Home = ({ isLoading, setError, setLoading, isMobile }: HomeProps) => {
 						saveWidget(activeLayout.id, item);
 					}}
 					setError={setError}
+					mobile={isMobile}
 					editMode={!isMobile}
 				>
 					{activeLayout.widgets.map((widget: WidgetDocument) => (
