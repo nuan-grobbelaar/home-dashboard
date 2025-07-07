@@ -22,7 +22,8 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 
 export function useWidgetGridStore(
 	setLoading: (loading: LoadingState) => void,
-	setError: (error: String | null) => void
+	setError: (error: String | null) => void,
+	isMobile: boolean
 ) {
 	const db = getFirestore();
 
@@ -92,7 +93,11 @@ export function useWidgetGridStore(
 		if (!silent) setLoading({ isLoading: true, message: "Loading layout" });
 
 		const activeLayoutRef = collection(db, "users", user.uid, "widget-layouts");
-		const q = query(activeLayoutRef, where("active", "==", true));
+		const q = query(
+			activeLayoutRef,
+			where("active", "==", true),
+			where("mobile", "==", isMobile)
+		);
 
 		getDocs(q)
 			.then((querySnapshot) => {
@@ -131,8 +136,6 @@ export function useWidgetGridStore(
 
 		const { id, ...data } = widget;
 
-		const defaultDatasource = widget.datasources["default"];
-
 		const widgetData: WidgetDocument = {
 			componentLayoutRef: doc(
 				db,
@@ -147,8 +150,8 @@ export function useWidgetGridStore(
 			}>((agg, [datasourceName, datasourceData]) => {
 				const datasource = datasourceData.datasource
 					? datasourceData.datasource
-					: defaultDatasource.datasourceApp
-					? doc(db, "users", user.uid, "apps", defaultDatasource.datasourceApp)
+					: datasourceData.datasourceApp
+					? doc(db, "users", user.uid, "apps", datasourceData.datasourceApp)
 					: null;
 
 				if (!datasource) return agg;

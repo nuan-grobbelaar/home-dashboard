@@ -23,7 +23,8 @@ const Home = ({ isLoading, setError, setLoading, isMobile }: HomeProps) => {
 
 	const { activeLayout, saveWidget, deleteWidget } = useWidgetGridStore(
 		setLoading,
-		setError
+		setError,
+		isMobile
 	);
 
 	if (isLoading.isLoading) {

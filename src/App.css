@@ -35,6 +35,7 @@ select {
 .dashboard[data-mobile="true"] {
   height: auto;
   padding: 8px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
 }
 
 .widget-grid {
@@ -111,7 +112,7 @@ select {
   /* background-color: #ddd; */
 }
 
-.widget__widget-type-select {
+.widget__select {
   border: 2px solid black;
   font-family: 'Bebas Neue', sans-serif;
 
@@ -135,11 +136,11 @@ select {
   -ms-overflow-style: none;
 }
 
-.widget__widget-type-select__option {
+.widget__select__option {
   color: black;
 }
 
-.widget__widget-type-select__option:hover {
+.widget__select__option:hover {
   text-decoration: underline;
 }
 
@@ -263,6 +264,14 @@ select {
   100% {
     transform: translateX(300%);
   }
+}
+
+.input_component {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .input-form {
@@ -401,6 +410,7 @@ button {
   border: none;
   height: 100%;
   aspect-ratio: 1 / 1;
+  color: #000
 }
 
 .input-form__form .input-form__form-submit-button {

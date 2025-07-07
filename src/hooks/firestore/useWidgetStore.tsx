@@ -16,18 +16,17 @@ import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
 import Barchart from "../../components/widget-components/Barchart";
 import type { LoadingState } from "../../components/widget-grid-infrastructure/Widget";
-import InputForm from "../../components/widget-components/InputForm";
 import {
 	isInsertQuery,
 	type ComponentName,
 	type Query,
 	type QueryGroupBy,
-	type WhereClause,
 	type WidgetComponentDocument,
 	type WidgetComponentLayoutDocument,
 	type WidgetDatasourceQueryResponseData,
 	type WidgetDocument,
 } from "./types";
+import Input from "../../components/widget-components/Input";
 
 const monthOrder = [
 	"jan",
@@ -49,7 +48,7 @@ export const widgetComponentRegistry: Record<
 	React.ComponentType<any>
 > = {
 	barchart: Barchart,
-	input: InputForm,
+	input: Input,
 };
 
 export function useWidgetStore(
@@ -215,8 +214,8 @@ export function useWidgetStore(
 			// Special case
 			if (wc.value == "currentMonth") {
 				const now = new Date();
-				const start = new Date(now.getFullYear(), now.getMonth(), 1);
-				const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+				const start = new Date(now.getFullYear(), now.getMonth() - 1, 15);
+				const end = new Date(now.getFullYear(), now.getMonth(), 15);
 
 				whereClauses.push(where("timestamp", ">=", start));
 				whereClauses.push(where("timestamp", "<", end));
@@ -255,13 +254,17 @@ export function useWidgetStore(
 		}
 	}
 
-	function insertIntoWidgetDatasource(datasourceEntryData: {
-		[field: string]: any;
-	}) {
+	function insertIntoWidgetDatasource(
+		datasourceEntryData: {
+			[field: string]: any;
+		},
+		datasourceName?: string
+	) {
 		const user = auth.currentUser;
 		if (!user) return Promise.reject(new Error("Not authenticated"));
 
-		const { datasource, datasourceQuery } = widget.datasources["default"];
+		const { datasource, datasourceQuery } =
+			widget.datasources[datasourceName ? datasourceName : "default"];
 
 		if (!datasource || !datasourceQuery) return Promise.reject(); //remove later
 

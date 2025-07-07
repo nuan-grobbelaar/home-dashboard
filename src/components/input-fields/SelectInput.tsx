@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
-import type { InputProps } from "../widget-components/InputForm";
+import type { InputElementProps } from "../widget-components/InputForm";
 import PopupPortal from "./PopupPortal";
 import ChevronUpIcon from "../../icons/ChevronUpIcon";
 import ChevronDownIcon from "../../icons/ChevronDownIcon";
 
-export interface SelectInputProps extends InputProps {
+export interface SelectInputProps extends InputElementProps {
 	options: Array<{ id: any; value: any; title: string }>;
 }
 
@@ -32,6 +32,7 @@ const SelectInput = (props: SelectInputProps) => {
 						type="text"
 						value={props.value ? props.value : ""}
 						readOnly
+						required
 						// onChange={(e) => props.onInputChange(props.id, e.target.value)}
 					/>
 					<button className="action-button">

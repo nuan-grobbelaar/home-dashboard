@@ -1,8 +1,8 @@
 import { Timestamp } from "firebase/firestore";
-import type { InputProps } from "../widget-components/InputForm";
+import type { InputElementProps } from "../widget-components/InputForm";
 import { useEffect } from "react";
 
-export interface DateInputProps extends InputProps {}
+export interface DateInputProps extends InputElementProps {}
 
 const convertToFirestoreTimestamp = (date: Date) => {
 	return Timestamp.fromDate(date);
@@ -22,8 +22,9 @@ const convertToDateTimeString = (firestoreTimestamp: Timestamp) => {
 
 const DateInput = (props: DateInputProps) => {
 	useEffect(() => {
-		props.onInputChange(props.id, convertToFirestoreTimestamp(new Date()));
-	}, []);
+		if (!props.value)
+			props.onInputChange(props.id, convertToFirestoreTimestamp(new Date()));
+	}, [props.value]);
 
 	return (
 		<div className="input" data-hasvalue={props.value && props.value != ""}>

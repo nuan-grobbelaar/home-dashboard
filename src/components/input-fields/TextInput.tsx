@@ -1,11 +1,11 @@
-import type { InputProps } from "../widget-components/InputForm";
+import type { InputElementProps } from "../widget-components/InputForm";
 
-export interface TextInputProps extends InputProps {}
+export interface TextInputProps extends InputElementProps {}
 
 const TextInput = (props: TextInputProps) => {
 	return (
 		<div className="input" data-hasvalue={props.value && props.value != ""}>
-			{props.label && <label htmlFor={props.id}>{props.id}</label>}
+			<label htmlFor={props.id}>{props.id}</label>
 			<input
 				className="input-text"
 				name={props.id}

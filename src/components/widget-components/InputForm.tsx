@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TextInput from "../input-fields/TextInput";
 import NumberInput from "../input-fields/NumberInput";
 import DateInput from "../input-fields/DateInput";
 import SelectInput from "../input-fields/SelectInput";
 import {
-	isInsertQuery,
 	type InsertQuery,
 	type WidgetDatasourceQueryResponseData,
 } from "../../hooks/firestore/types";
 
 export interface InputFormProps {
 	data: WidgetDatasourceQueryResponseData;
+	insertQuery: InsertQuery;
 	insert: (data: { [field: string]: any }) => void;
 }
 
-export interface InputProps {
+export interface InputElementProps {
 	id: string;
 	value: any;
 	label?: boolean;
@@ -34,31 +34,49 @@ export const widgetComponentRegistry: Record<
 };
 
 const InputForm = (props: InputFormProps) => {
-	const defaultDatasource = props.data["default"];
-
-	if (!defaultDatasource) throw new Error("Default datasource not set"); //TODO: need better handling
-
-	if (!isInsertQuery(defaultDatasource))
-		throw new Error("Datasource not a query"); //TODO: need better handling
-
-	const insertQuery: InsertQuery = defaultDatasource;
+	const getFormValidationInitialData = () => {
+		return Object.entries(props.insertQuery.insert).reduce<{
+			[field: string]: { valid: boolean; reason?: string };
+		}>((agg, [field, properties]) => {
+			agg[field] = properties.required
+				? { valid: false, reason: "field not set" }
+				: { valid: true };
+			return agg;
+		}, {});
+	};
 
 	const [formData, setFormData] = useState<{ [field: string]: any }>({});
+	const [formValidation, setFormValidation] = useState<{
+		[field: string]: { valid: boolean; reason?: string };
+	}>(getFormValidationInitialData());
 
 	const handleInputChange = (id: string, value: string) => {
 		setFormData((prev) => ({
 			...prev,
 			[id]: value,
 		}));
+
+		setFormValidation((prev) => ({
+			...prev,
+			[id]: { valid: !!value }, //TODO: fix for empty strings
+		}));
 	};
+
+	const inputsValid = useMemo(() => {
+		return !Object.values(formValidation).some(({ valid }) => !valid);
+	}, [formValidation]);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		props.insert(formData);
-		setFormData({});
+		if (inputsValid) {
+			console.log("submitting");
+			props.insert(formData);
+			setFormData({});
+			setFormValidation(getFormValidationInitialData());
+		}
 	};
 
-	console.log("inputs", insertQuery.insert);
+	console.log("inputs", props.insertQuery.insert);
 
 	return (
 		<div className="input-form">
@@ -67,8 +85,8 @@ const InputForm = (props: InputFormProps) => {
 				onSubmit={handleSubmit}
 				autoComplete="off"
 			>
-				{insertQuery.insert &&
-					Object.entries(insertQuery.insert)
+				{props.insertQuery.insert &&
+					Object.entries(props.insertQuery.insert)
 						.sort(([_a, { order: orderA }], [_b, { order: orderB }]) =>
 							orderA && orderB ? orderA - orderB : 0
 						)

@@ -31,10 +31,10 @@ const WidgetTypeSelect = (props: WidgetTypeSelectProps) => {
 		if (props.widgetDefinitions && props.widgetDefinitions.length > 0) {
 			if (!type) {
 				setContent(
-					<div className="widget__widget-type-select">
+					<div className="widget__select">
 						{props.widgetDefinitions.map((option, i) => (
 							<div
-								className="widget__widget-type-select__option"
+								className="widget__select__option"
 								onClick={() => setType(option.type)}
 								ref={(el) => {
 									optionRefs.current[i] = el;
@@ -51,11 +51,11 @@ const WidgetTypeSelect = (props: WidgetTypeSelectProps) => {
 				);
 				if (widgetDefinition) {
 					setContent(
-						<div className="widget__widget-type-select">
+						<div className="widget__select">
 							{widgetDefinition.widgetComponentLayoutDefinitions.map(
 								(option, i) => (
 									<div
-										className="widget__widget-type-select__option"
+										className="widget__select__option"
 										onClick={() =>
 											props.onSave({
 												position: props.widgetPosition,

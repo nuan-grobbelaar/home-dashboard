@@ -1,6 +1,6 @@
-import type { InputProps } from "../widget-components/InputForm";
+import type { InputElementProps } from "../widget-components/InputForm";
 
-export interface NumberInputProps extends InputProps {}
+export interface NumberInputProps extends InputElementProps {}
 
 const NumberInput = (props: NumberInputProps) => {
 	return (
