@@ -37,6 +37,7 @@ const monthOrder = [
 	"jun",
 	"jul",
 	"aug",
+	"sep",
 	"sept",
 	"oct",
 	"nov",

@@ -14,6 +14,7 @@ export interface GridItem {
 	unsaved?: boolean;
 	isLoading?: LoadingState;
 	editMode?: boolean;
+	isMobile?: boolean;
 	onSave?: (item: any) => void;
 	removeItem?: (id?: string) => void;
 }

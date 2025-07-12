@@ -59,6 +59,7 @@ const Home = ({ isLoading, setError, setLoading, isMobile }: HomeProps) => {
 							}
 							dbRef={widget.dbRef}
 							setError={setError}
+							isMobile={isMobile}
 						>
 							{widget.type}
 						</Widget>

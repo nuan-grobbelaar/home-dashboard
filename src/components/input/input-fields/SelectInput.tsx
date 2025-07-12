@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import type { InputElementProps } from "../widget-components/InputForm";
+import type { InputElementProps } from "../../widget-components/InputForm";
 import PopupPortal from "./PopupPortal";
-import ChevronUpIcon from "../../icons/ChevronUpIcon";
-import ChevronDownIcon from "../../icons/ChevronDownIcon";
+import ChevronUpIcon from "../../../icons/ChevronUpIcon";
+import ChevronDownIcon from "../../../icons/ChevronDownIcon";
 
 export interface SelectInputProps extends InputElementProps {
 	options: Array<{ id: any; value: any; title: string }>;

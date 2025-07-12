@@ -5,10 +5,13 @@ import {
 	type WidgetDatasourceQueryResponseData,
 } from "../../hooks/firestore/types";
 import InputForm from "./InputForm";
+import OptionSelector from "../input/OptionSelector";
+import InputContainer from "../input/InputContainer";
 
 export interface InputProps {
 	data: WidgetDatasourceQueryResponseData;
 	insert: (data: { [field: string]: any }, datasourceName: string) => void;
+	isMobile?: boolean;
 }
 
 const Input = (props: InputProps) => {
@@ -25,27 +28,27 @@ const Input = (props: InputProps) => {
 
 	return (
 		<div className="input_component">
-			{!activeInsert ? (
-				<div className="widget__select">
-					{insertDatasources.map(([datasourceName, insertQuery], i) => (
-						<div
-							key={i}
-							className="widget__select__option"
-							onClick={() => setActiveInsert([datasourceName, insertQuery])}
-						>
-							{datasourceName}
-						</div>
-					))}
-				</div>
-			) : (
-				<InputForm
-					data={props.data}
-					insert={(data: { [field: string]: any }) =>
-						props.insert(data, activeInsert[0])
-					}
-					insertQuery={activeInsert[1]}
-				/>
-			)}
+			<InputContainer
+				title="Insert"
+				onBack={!!activeInsert ? () => setActiveInsert(null) : undefined}
+				expanded={!!activeInsert && props.isMobile}
+			>
+				{!activeInsert ? (
+					<OptionSelector
+						options={insertDatasources}
+						displayCallback={(option) => option[0]}
+						onSelect={(option) => setActiveInsert(option)}
+					/>
+				) : (
+					<InputForm
+						data={props.data}
+						insert={(data: { [field: string]: any }) =>
+							props.insert(data, activeInsert[0])
+						}
+						insertQuery={activeInsert[1]}
+					/>
+				)}
+			</InputContainer>
 		</div>
 	);
 };

@@ -4,6 +4,8 @@ import type {
 	WidgetCreationData,
 	WidgetDefinition,
 } from "../../hooks/firestore/types";
+import OptionSelector from "../input/OptionSelector";
+import InputContainer from "../input/InputContainer";
 
 export interface WidgetTypeSelectProps {
 	widgetDefinitions: WidgetDefinition[];
@@ -31,19 +33,13 @@ const WidgetTypeSelect = (props: WidgetTypeSelectProps) => {
 		if (props.widgetDefinitions && props.widgetDefinitions.length > 0) {
 			if (!type) {
 				setContent(
-					<div className="widget__select">
-						{props.widgetDefinitions.map((option, i) => (
-							<div
-								className="widget__select__option"
-								onClick={() => setType(option.type)}
-								ref={(el) => {
-									optionRefs.current[i] = el;
-								}}
-							>
-								{option.type}
-							</div>
-						))}
-					</div>
+					<InputContainer expanded>
+						<OptionSelector
+							options={props.widgetDefinitions}
+							displayCallback={(option) => option.type}
+							onSelect={(option) => setType(option.type)}
+						/>
+					</InputContainer>
 				);
 			} else {
 				const widgetDefinition = props.widgetDefinitions.find(
@@ -51,27 +47,19 @@ const WidgetTypeSelect = (props: WidgetTypeSelectProps) => {
 				);
 				if (widgetDefinition) {
 					setContent(
-						<div className="widget__select">
-							{widgetDefinition.widgetComponentLayoutDefinitions.map(
-								(option, i) => (
-									<div
-										className="widget__select__option"
-										onClick={() =>
-											props.onSave({
-												position: props.widgetPosition,
-												type: type,
-												...option,
-											})
-										}
-										ref={(el) => {
-											optionRefs.current[i] = el;
-										}}
-									>
-										{option.name}
-									</div>
-								)
-							)}
-						</div>
+						<InputContainer expanded>
+							<OptionSelector
+								options={widgetDefinition.widgetComponentLayoutDefinitions}
+								displayCallback={(option) => option.name}
+								onSelect={(option) =>
+									props.onSave({
+										position: props.widgetPosition,
+										type: type,
+										...option,
+									})
+								}
+							/>
+						</InputContainer>
 					);
 				} else {
 					console.error("error");

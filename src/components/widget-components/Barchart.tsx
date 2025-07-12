@@ -14,6 +14,12 @@ export interface BarchartProps {
 
 const Barchart = (props: BarchartProps) => {
 	const defaultDatasource = props.data["default"];
+	const coloursArray = props.data["colours"] as Array<{ [key: string]: any }>;
+
+	const colours = coloursArray.reduce((agg, curr) => {
+		agg[curr.title] = curr.value;
+		return agg;
+	}, {});
 
 	if (!defaultDatasource) {
 		console.warn(`Default datasource not set`, props.data);
@@ -39,29 +45,9 @@ const Barchart = (props: BarchartProps) => {
 			{graphData.find(
 				(d) => typeof d.value === "object" && d.value !== null
 			) ? (
-				<StackedBars
-					groupColours={{
-						groceries: "#a8d5ba",
-						rent: "#f7c8c8",
-						pets: "#fce4b5",
-						entertainment: "#cbb4d4",
-						transport: "#bcdffb",
-						utilities: "#f9d6ac",
-						toys: "#b3e3dc",
-					}}
-				/>
+				<StackedBars groupColours={colours} />
 			) : (
-				<Bars
-					groupColours={{
-						groceries: "#a8d5ba",
-						rent: "#f7c8c8",
-						pets: "#fce4b5",
-						entertainment: "#cbb4d4",
-						transport: "#bcdffb",
-						utilities: "#f9d6ac",
-						toys: "#b3e3dc",
-					}}
-				/>
+				<Bars groupColours={colours} />
 			)}
 		</Graph>
 	);

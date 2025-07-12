@@ -103,6 +103,7 @@ const Widget = (props: WidgetProps) => {
 									<Component
 										data={widgetData}
 										insert={insertIntoWidgetDatasource}
+										isMobile={props.isMobile}
 										{...component.props}
 									/>
 								}

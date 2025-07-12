@@ -1,15 +1,16 @@
-import type { InputElementProps } from "../widget-components/InputForm";
+import type { InputElementProps } from "../../widget-components/InputForm";
 
-export interface TextInputProps extends InputElementProps {}
+export interface NumberInputProps extends InputElementProps {}
 
-const TextInput = (props: TextInputProps) => {
+const NumberInput = (props: NumberInputProps) => {
 	return (
 		<div className="input" data-hasvalue={props.value && props.value != ""}>
 			<label htmlFor={props.id}>{props.id}</label>
 			<input
 				className="input-text"
 				name={props.id}
-				type="text"
+				type="number"
+				step=".01"
 				value={props.value ? props.value : ""}
 				onChange={(e) => props.onInputChange(props.id, e.target.value)}
 			/>
@@ -17,4 +18,4 @@ const TextInput = (props: TextInputProps) => {
 	);
 };
 
-export default TextInput;
+export default NumberInput;
