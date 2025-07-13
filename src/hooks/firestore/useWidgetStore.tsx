@@ -75,7 +75,7 @@ export function useWidgetStore(
 					}));
 				}
 			});
-		}, 30000); // TODO: this should change based on user activity / which view is being loaded.
+		}, 5000); // TODO: this should change based on user activity / which view is being loaded.
 		return () => clearInterval(interval);
 	}, []);
 
@@ -215,11 +215,44 @@ export function useWidgetStore(
 			// Special case
 			if (wc.value == "currentMonth") {
 				const now = new Date();
-				const start = new Date(now.getFullYear(), now.getMonth() - 1, 15);
-				const end = new Date(now.getFullYear(), now.getMonth(), 15);
+				const currentDay = now.getDate();
+				const currentMonth = now.getMonth();
+				const currentYear = now.getFullYear();
 
-				whereClauses.push(where("timestamp", ">=", start));
-				whereClauses.push(where("timestamp", "<", end));
+				// TODO: configurable start date
+				const periodStart = 15;
+
+				if (currentDay < periodStart) {
+					whereClauses.push(
+						where(
+							"timestamp",
+							">=",
+							new Date(currentYear, currentMonth - 1, periodStart)
+						)
+					);
+					whereClauses.push(
+						where(
+							"timestamp",
+							"<",
+							new Date(currentYear, currentMonth, periodStart)
+						)
+					);
+				} else {
+					whereClauses.push(
+						where(
+							"timestamp",
+							">=",
+							new Date(currentYear, currentMonth, periodStart)
+						)
+					);
+					whereClauses.push(
+						where(
+							"timestamp",
+							"<",
+							new Date(currentYear, currentMonth + 1, periodStart)
+						)
+					);
+				}
 			} else whereClauses.push(where(wc.field, wc.operator, wc.value));
 		}
 
@@ -252,7 +285,7 @@ export function useWidgetStore(
 			}));
 
 			return data;
-		}
+		} else return [];
 	}
 
 	function insertIntoWidgetDatasource(

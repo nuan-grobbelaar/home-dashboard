@@ -12,8 +12,21 @@ export interface BarsProps
 	groupColours: { [groupName: string]: string };
 }
 
+const calculateXPos = (
+	data: GraphData,
+	xScaleBand: d3.ScaleBand<string>,
+	maxWidth: number
+) => {
+	const bandX = xScaleBand!(data.title)!;
+	const bandwidth = xScaleBand!.bandwidth();
+	const actualWidth = Math.min(bandwidth, maxWidth);
+	return bandX + (bandwidth - actualWidth) / 2;
+};
+
 const Bars = (props: BarsProps) => {
 	const gRef = useRef<SVGGElement>(null);
+
+	const maxWidth = props.width! * 0.1;
 
 	useEffect(() => {
 		if (
@@ -30,8 +43,8 @@ const Bars = (props: BarsProps) => {
 					(enter) =>
 						enter
 							.append("rect")
-							.attr("x", (d) => props.xScaleBand!(d.title)!)
-							.attr("width", props.xScaleBand!.bandwidth())
+							.attr("x", (d) => calculateXPos(d, props.xScaleBand!, maxWidth))
+							.attr("width", Math.min(props.xScaleBand!.bandwidth(), maxWidth))
 							.attr("y", () => props.yScaleBand!(0))
 							.attr("height", 0)
 							.attr("fill", (d) => props.groupColours?.[d.title] ?? "#fff")
@@ -49,8 +62,8 @@ const Bars = (props: BarsProps) => {
 
 					(update) =>
 						update
-							.attr("x", (d) => props.xScaleBand!(d.title)!)
-							.attr("width", props.xScaleBand!.bandwidth())
+							.attr("x", (d) => calculateXPos(d, props.xScaleBand!, maxWidth))
+							.attr("width", Math.min(props.xScaleBand!.bandwidth(), maxWidth))
 							.attr("y", (d) => props.yScaleBand!(+d.value!))
 							.attr(
 								"height",
