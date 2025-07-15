@@ -2,14 +2,14 @@ import { useState } from "react";
 import {
 	isInsertQuery,
 	type InsertQuery,
-	type WidgetDatasourceQueryResponseData,
+	type WidgetDatasourceResponse,
 } from "../../hooks/firestore/types";
-import InputForm from "./InputForm";
+import InputForm from "../input/InputForm";
 import OptionSelector from "../input/OptionSelector";
 import InputContainer from "../input/InputContainer";
 
 export interface InputProps {
-	data: WidgetDatasourceQueryResponseData;
+	data: WidgetDatasourceResponse<unknown>;
 	insert: (data: { [field: string]: any }, datasourceName: string) => void;
 	isMobile?: boolean;
 }

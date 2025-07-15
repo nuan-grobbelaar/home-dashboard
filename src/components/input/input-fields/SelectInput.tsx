@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { InputElementProps } from "../../widget-components/InputForm";
+import type { InputElementProps } from "../InputForm";
 import PopupPortal from "./PopupPortal";
 import ChevronUpIcon from "../../../icons/ChevronUpIcon";
 import ChevronDownIcon from "../../../icons/ChevronDownIcon";

@@ -1,6 +1,6 @@
 import type { DocumentReference } from "firebase/firestore";
 import type { GridItem, GridItemPosition } from "../grid/useGridItemPlacer";
-import type { InputType } from "../../components/widget-components/InputForm";
+import type { InputType } from "../../components/input/InputForm";
 
 export interface WidgetLayoutDocument {
 	id?: any;
@@ -28,7 +28,7 @@ export type WidgetCreationData = WidgetComponentLayoutDefinitionDocument &
 		type: string;
 	};
 
-export type ComponentName = "barchart" | "input";
+export type ComponentName = "barchart" | "input" | "browser";
 
 export interface WidgetComponentDocument {
 	id: string;
@@ -62,12 +62,65 @@ export interface WidgetComponentLayoutDocument {
 	components: Array<WidgetComponentDocument>;
 }
 
-export interface WidgetDatasourceQueryResponseData {
-	[datasourceName: string]:
-		| Array<{
-				[key: string]: string | number | { [key: string]: any };
-		  }>
-		| Query;
+export interface WidgetDatasourceResponse<T> {
+	[datasourceName: string]: T;
+}
+
+export interface WidgetDatasourceDataResponse
+	extends WidgetDatasourceResponse<Array<DatasourceData>> {}
+
+export interface WidgetDatasourceTypedDataResponse<T extends DatasourceData>
+	extends WidgetDatasourceResponse<Array<T>> {}
+
+export interface WidgetDatasourceQueryResponse
+	extends WidgetDatasourceResponse<Query> {}
+
+export function isWidgetDatasourceDataResponse<T extends DatasourceData>(
+	value: any,
+	dataVerificationFunc: (v: any) => v is T
+): value is WidgetDatasourceTypedDataResponse<T> {
+	return (
+		value &&
+		typeof value === "object" &&
+		!Array.isArray(value) &&
+		Object.values(value).every(
+			(val) => Array.isArray(val) && val.every((v) => dataVerificationFunc(v))
+		)
+	);
+}
+
+export interface DatasourceData {
+	title: string;
+}
+
+export interface DatasourceDataString extends DatasourceData {
+	value: string;
+}
+
+export interface DatasourceDataNumber extends DatasourceData {
+	value: number;
+}
+
+export interface DatasourceDataMap extends DatasourceData {
+	value: { [key: string]: any };
+}
+
+export function isDatasourceDataString(dp: any): dp is DatasourceDataString {
+	return dp && dp.value && typeof dp.value === "string";
+}
+
+export function isDatasourceDataStringOrUndefined(
+	dp: any
+): dp is DatasourceDataString {
+	return dp && (!dp.value || typeof dp.value === "string");
+}
+
+export function isDatasourceDataNumber(dp: any): dp is DatasourceDataNumber {
+	return dp && dp.value && typeof dp.value === "number";
+}
+
+export function isDatasourceDataMap(dp: any): dp is DatasourceDataMap {
+	return dp && typeof dp.value === "object" && !Array.isArray(dp.value);
 }
 
 export interface WidgetComponentDefinitionDocument {

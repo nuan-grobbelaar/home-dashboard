@@ -5,6 +5,7 @@ import type {
 	GraphComponentProps,
 	GraphData,
 } from "./Graph";
+import { calculateXPos } from "./Bars";
 
 export interface StackedBarsProps
 	extends GraphComponentProps,
@@ -37,6 +38,8 @@ function normalizeStackedData(data: GraphData[]): Record<string, any>[] {
 
 const StackedBars = (props: StackedBarsProps) => {
 	const gRef = useRef<SVGGElement>(null);
+
+	const maxWidth = props.width! * 0.1;
 
 	useEffect(() => {
 		if (
@@ -77,8 +80,17 @@ const StackedBars = (props: StackedBarsProps) => {
 						(enter) =>
 							enter
 								.append("rect")
-								.attr("x", (d) => props.xScaleBand!(String(d.data.title)) ?? 0)
-								.attr("width", props.xScaleBand!.bandwidth())
+								.attr("x", (d) =>
+									calculateXPos(
+										String(d.data.title),
+										props.xScaleBand!,
+										maxWidth
+									)
+								)
+								.attr(
+									"width",
+									Math.min(props.xScaleBand!.bandwidth(), maxWidth)
+								)
 								.attr("y", props.yScaleBand!(0))
 								.attr("height", 0)
 								.classed("chart__barchart__bar", true)
@@ -104,8 +116,17 @@ const StackedBars = (props: StackedBarsProps) => {
 							update
 								.transition()
 								.duration(750)
-								.attr("x", (d) => props.xScaleBand!(String(d.data.title)) ?? 0)
-								.attr("width", props.xScaleBand!.bandwidth())
+								.attr("x", (d) =>
+									calculateXPos(
+										String(d.data.title),
+										props.xScaleBand!,
+										maxWidth
+									)
+								)
+								.attr(
+									"width",
+									Math.min(props.xScaleBand!.bandwidth(), maxWidth)
+								)
 								.attr("y", (d) => props.yScaleBand!(d[1]))
 								.attr(
 									"height",

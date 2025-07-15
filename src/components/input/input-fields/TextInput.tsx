@@ -1,4 +1,4 @@
-import type { InputElementProps } from "../../widget-components/InputForm";
+import type { InputElementProps } from "../InputForm";
 
 export interface TextInputProps extends InputElementProps {}
 

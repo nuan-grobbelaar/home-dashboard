@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
-import TextInput from "../input/input-fields/TextInput";
-import NumberInput from "../input/input-fields/NumberInput";
-import DateInput from "../input/input-fields/DateInput";
-import SelectInput from "../input/input-fields/SelectInput";
+import TextInput from "./input-fields/TextInput";
+import NumberInput from "./input-fields/NumberInput";
+import DateInput from "./input-fields/DateInput";
+import SelectInput from "./input-fields/SelectInput";
 import {
 	type InsertQuery,
-	type WidgetDatasourceQueryResponseData,
+	type WidgetDatasourceResponse,
 } from "../../hooks/firestore/types";
 
 export interface InputFormProps {
-	data: WidgetDatasourceQueryResponseData;
+	data: WidgetDatasourceResponse<unknown>;
 	insertQuery: InsertQuery;
 	insert: (data: { [field: string]: any }) => void;
 }

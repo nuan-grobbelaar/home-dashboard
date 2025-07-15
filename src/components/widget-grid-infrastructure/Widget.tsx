@@ -96,7 +96,12 @@ const Widget = (props: WidgetProps) => {
 				>
 					{widgetComponentLayout.components.map((component) => {
 						const Component = widgetComponentRegistry[component.type];
-
+						if (!Component) {
+							props.setError?.(
+								`Widget Component "${component.type}" not defined`
+							);
+						}
+						const componentProps = component.props ? component.props : { t: 1 };
 						return (
 							<WidgetComponent key={component.id} position={component.position}>
 								{
@@ -104,7 +109,7 @@ const Widget = (props: WidgetProps) => {
 										data={widgetData}
 										insert={insertIntoWidgetDatasource}
 										isMobile={props.isMobile}
-										{...component.props}
+										{...componentProps}
 									/>
 								}
 							</WidgetComponent>

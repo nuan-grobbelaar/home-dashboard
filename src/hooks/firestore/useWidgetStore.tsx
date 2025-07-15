@@ -23,10 +23,11 @@ import {
 	type QueryGroupBy,
 	type WidgetComponentDocument,
 	type WidgetComponentLayoutDocument,
-	type WidgetDatasourceQueryResponseData,
+	type WidgetDatasourceResponse,
 	type WidgetDocument,
 } from "./types";
 import Input from "../../components/widget-components/Input";
+import Browser from "../../components/widget-components/Browser";
 
 const monthOrder = [
 	"jan",
@@ -50,6 +51,7 @@ export const widgetComponentRegistry: Record<
 > = {
 	barchart: Barchart,
 	input: Input,
+	browser: Browser,
 };
 
 export function useWidgetStore(
@@ -60,7 +62,7 @@ export function useWidgetStore(
 	const [widgetComponentLayout, setWidgetComponentLayout] =
 		useState<WidgetComponentLayoutDocument>();
 	const [widgetData, setWidgetData] =
-		useState<WidgetDatasourceQueryResponseData>();
+		useState<WidgetDatasourceResponse<unknown>>();
 
 	useEffect(() => {
 		loadWidgetComponentLayout();
@@ -220,7 +222,7 @@ export function useWidgetStore(
 				const currentYear = now.getFullYear();
 
 				// TODO: configurable start date
-				const periodStart = 15;
+				const periodStart = 14;
 
 				if (currentDay < periodStart) {
 					whereClauses.push(
@@ -275,6 +277,8 @@ export function useWidgetStore(
 
 		const dataSnapshot = await getDocs(q);
 
+		console.log(datasourceQuery, dataSnapshot);
+
 		if (!dataSnapshot.empty) {
 			const rawData = dataSnapshot.docs.map((d) => d.data());
 			const aggregatedData = processData(rawData, datasourceQuery);
@@ -320,10 +324,11 @@ export function useWidgetStore(
 
 		try {
 			if (datasource && datasourceQuery) {
-				if (datasourceQuery.groupBy && datasourceQuery.target) {
-					return await queryWidgetDatasource(datasource, datasourceQuery);
-				} else if (isInsertQuery(datasourceQuery)) {
+				console.log(datasourceQuery);
+				if (isInsertQuery(datasourceQuery)) {
 					return datasourceQuery;
+				} else if (datasourceQuery.collection) {
+					return await queryWidgetDatasource(datasource, datasourceQuery);
 				} else {
 					console.warn(
 						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
@@ -340,6 +345,7 @@ export function useWidgetStore(
 	}
 
 	function loadWidgetDataFromDatasources() {
+		console.log(widget.datasources);
 		if (!widget.datasources) return;
 		for (const datasourceName of Object.keys(widget.datasources)) {
 			loadWidgetDataFromDatasource(datasourceName).then((data) => {

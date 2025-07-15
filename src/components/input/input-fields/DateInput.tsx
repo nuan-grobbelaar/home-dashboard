@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import type { InputElementProps } from "../../widget-components/InputForm";
+import type { InputElementProps } from "../InputForm";
 import { useEffect } from "react";
 
 export interface DateInputProps extends InputElementProps {}
