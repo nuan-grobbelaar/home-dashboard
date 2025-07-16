@@ -25,7 +25,9 @@ const InputContainer = (props: InputContainerProps) => {
 					)}
 				</div>
 			)}
-			<div className="input-container__container">{props.children}</div>
+			<div className="input-container__container">
+				<div className="input-container__container-items">{props.children}</div>
+			</div>
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import Graph, { isGraphDataArray } from "../graph-components/Graph";
+import Graph from "../graph-components/Graph";
 import XAxisScaling from "../graph-components/XAxisScaling";
 import YAxisLinear from "../graph-components/YAxisLinear";
 import GridLines from "../graph-components/GridLines";
@@ -7,14 +7,11 @@ import StackedBars from "../graph-components/StackedBars";
 import {
 	isDatasourceDataMap,
 	isDatasourceDataNumber,
-	isDatasourceDataString,
 	isDatasourceDataStringOrUndefined,
-	isWidgetDatasourceDataResponse,
 	type DatasourceDataMap,
 	type DatasourceDataNumber,
 	type DatasourceDataString,
 	type WidgetDatasourceResponse,
-	type WidgetDatasourceTypedDataResponse,
 } from "../../hooks/firestore/types";
 
 export interface BarchartProps {

@@ -1,19 +1,81 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	isDatasourceDataMap,
-	isInsertQuery,
 	isWidgetDatasourceDataResponse,
 	type DatasourceDataMap,
-	type InsertQuery,
-	type WidgetDatasourceDataResponse,
 	type WidgetDatasourceResponse,
 	type WidgetDatasourceTypedDataResponse,
 } from "../../hooks/firestore/types";
+import InputContainer from "../input/InputContainer";
+import OptionSelector from "../input/OptionSelector";
 
-export interface BrowsertProps {
+export interface BrowserItemField {
+	name: string;
+	format: string;
+}
+
+export interface BrowserItemFormat {
+	title: BrowserItemField;
+	tag: BrowserItemField;
+	secondaryFields: BrowserItemField[];
+	expandedFields: BrowserItemField[];
+}
+
+export interface BrowserProps {
 	data: WidgetDatasourceResponse<unknown>;
 	isMobile?: boolean;
+	formats: { [datasourceName: string]: BrowserItemFormat };
 }
+
+interface BrowserItemProps {
+	format: BrowserItemFormat;
+	data: DatasourceDataMap;
+}
+
+const FIELD_FORMAT_CURRENCY = "currency";
+const FIELD_FORMAT_DATETIME = "datetime";
+
+const formatField = (value: any, format: string) => {
+	if (!value) return "";
+
+	if (format == FIELD_FORMAT_CURRENCY) {
+		return `€${value}`;
+	} else if (format == FIELD_FORMAT_DATETIME) {
+		return value.toDate().toISOString().slice(0, 10);
+	}
+
+	console.error(`Field Format ${format} not defined`);
+};
+
+const BrowserItem = (props: BrowserItemProps) => {
+	console.log("item", props.format, props.data);
+	return (
+		<div className="browser-item">
+			<div className="browser-item__title-bar">
+				<h2>{props.data.value[props.format.title.name]}</h2>
+				<span className="browser-item__title-bar__tag">
+					{props.data.value[props.format.tag.name]}
+				</span>
+			</div>
+			<div className="browser-item__secondary-item-container">
+				<div className="browser-item__secondary-item-container__title">
+					{props.format.secondaryFields.map((field) => (
+						<div>{`${field.name}:`}</div>
+					))}
+				</div>
+				<div className="browser-item__secondary-item-container__value">
+					{props.format.secondaryFields.map((field) => (
+						<div>
+							{field.format
+								? formatField(props.data.value[field.name], field.format)
+								: props.data.value[field.name]}
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+};
 
 const verifyData = (
 	data: WidgetDatasourceResponse<unknown>
@@ -24,17 +86,42 @@ const verifyData = (
 	throw new Error("Data is wrong format"); //TODO: better handling
 };
 
-const Browser = (props: BrowsertProps) => {
+const Browser = (props: BrowserProps) => {
+	console.log("formats", props.formats);
 	const data = verifyData(props.data);
+
+	const [selectedDatasource, setSelectedDatasource] = useState<string>();
+
+	const datasources = useMemo(() => Object.keys(data), [data]);
+
+	useEffect(() => {
+		if (datasources.length == 1) setSelectedDatasource(datasources[0]);
+	}, []);
 
 	return (
 		<div className="input_component">
-			{Object.entries(data).map(([k, values]) => {
-				console.log(k, values);
-				return values.map((d) =>
-					Object.entries(d.value).map(([k, v]) => <span>{"" + v}</span>)
-				);
-			})}
+			<InputContainer title="Browse" expanded>
+				{!selectedDatasource ? (
+					<OptionSelector
+						options={datasources}
+						// onSelect={(option) => setType(option.type)}
+					/>
+				) : (
+					<OptionSelector
+						options={data[selectedDatasource]}
+						displayCallback={(d) => (
+							<BrowserItem
+								data={d}
+								format={props.formats[selectedDatasource]}
+							/>
+						)}
+						// onSelect={(option) => setType(option.type)}
+					/>
+					// .map((d) =>
+					// 	Object.entries(d.value).map(([_, v]) => <span>{"" + v}</span>)
+					// )
+				)}
+			</InputContainer>
 		</div>
 	);
 };

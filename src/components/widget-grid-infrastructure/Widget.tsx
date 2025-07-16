@@ -62,16 +62,19 @@ const Widget = (props: WidgetProps) => {
 			data-unsaved={props.unsaved}
 			style={{
 				gridArea: `${props.position.colStart} / ${props.position.rowStart} / ${props.position.colEnd} / ${props.position.rowEnd}`,
+				aspectRatio:
+					(props.position.colEnd - props.position.colStart) /
+					(props.position.rowEnd - props.position.rowStart),
 			}}
 		>
-			{(props.unsaved || props.editMode) && (
+			{/* {(props.unsaved || props.editMode) && (
 				<button
 					className="close-button"
 					onClick={() => props.removeItem?.(props.id) ?? undefined}
 				>
 					x
 				</button>
-			)}
+			)} */}
 
 			{isLoading.isLoading ? (
 				<div className="widget__loading">

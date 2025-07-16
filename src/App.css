@@ -126,14 +126,6 @@ select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  /* Firefox */
-  scrollbar-width: none;
-  /* Internet Explorer and Edge */
-  -ms-overflow-style: none;
 }
 
 .input-container[data-expanded="true"] {
@@ -193,7 +185,20 @@ select {
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+
+  overflow-y: scroll;
+  overflow-x: hidden;
+
+  /* Firefox */
+  scrollbar-width: none;
+  /* Internet Explorer and Edge */
+  -ms-overflow-style: none;
+}
+
+.input-container__container-items {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .option-selector__option {
@@ -230,6 +235,7 @@ select {
 
 .widget-component {
   height: 100%;
+  overflow: hidden;
 }
 
 .chart {
@@ -478,4 +484,53 @@ button {
 .input-form__form .input-form__form-submit-button {
   margin-top: 10px;
   padding: 8px;
+}
+
+.browser-item {
+  /* max-height: 50px;
+  height: 50px; */
+  border: 2px solid black;
+
+  padding: 0 4px;
+  margin-bottom: 8px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.browser-item__title-bar {
+  display: flex;
+  height: 22px;
+}
+
+.browser-item__title-bar h2 {
+  font-size: 14px;
+  margin: 0;
+  margin-right: auto;
+}
+
+.browser-item__title-bar__tag {
+  font-size: 12px;
+}
+
+.browser-item__secondary-item-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  font-size: 12px;
+}
+
+.browser-item__secondary-item-container__title {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+  padding-right: 4px;
+}
+
+.browser-item__secondary-item-container__value {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
