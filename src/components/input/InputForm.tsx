@@ -23,10 +23,7 @@ export interface InputElementProps {
 
 export type InputType = "text" | "number" | "select" | "datetime";
 
-export const widgetComponentRegistry: Record<
-	InputType,
-	React.ComponentType<any>
-> = {
+export const inputRegistry: Record<InputType, React.ComponentType<any>> = {
 	text: TextInput,
 	number: NumberInput,
 	select: SelectInput,
@@ -91,7 +88,7 @@ const InputForm = (props: InputFormProps) => {
 							orderA && orderB ? orderA - orderB : 0
 						)
 						.map(([field, properties]) => {
-							const FormInput = widgetComponentRegistry[properties.type];
+							const FormInput = inputRegistry[properties.type];
 							const options =
 								properties.type == "select" && properties.datasource
 									? props.data[properties.datasource]

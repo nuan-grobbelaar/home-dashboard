@@ -48,7 +48,7 @@ const Home = ({ isLoading, setError, setLoading, isMobile }: HomeProps) => {
 					}}
 					setError={setError}
 					mobile={isMobile}
-					editMode={!isMobile}
+					editMode={false}
 				>
 					{activeLayout.widgets.map((widget: WidgetDocument) => (
 						<Widget

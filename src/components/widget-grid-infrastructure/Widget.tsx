@@ -67,14 +67,14 @@ const Widget = (props: WidgetProps) => {
 					(props.position.rowEnd - props.position.rowStart),
 			}}
 		>
-			{/* {(props.unsaved || props.editMode) && (
+			{(props.unsaved || props.editMode) && (
 				<button
 					className="close-button"
 					onClick={() => props.removeItem?.(props.id) ?? undefined}
 				>
 					x
 				</button>
-			)} */}
+			)}
 
 			{isLoading.isLoading ? (
 				<div className="widget__loading">
@@ -112,6 +112,7 @@ const Widget = (props: WidgetProps) => {
 										data={widgetData}
 										insert={insertIntoWidgetDatasource}
 										isMobile={props.isMobile}
+										editMode={props.editMode}
 										{...componentProps}
 									/>
 								}

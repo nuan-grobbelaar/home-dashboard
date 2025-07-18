@@ -6,7 +6,10 @@ import {
 	type WidgetDatasourceResponse,
 	type WidgetDatasourceTypedDataResponse,
 } from "../../hooks/firestore/types";
-import InputContainer from "../input/InputContainer";
+import InputContainer, {
+	type SearchConfig,
+	type SearchField,
+} from "../input/InputContainer";
 import OptionSelector from "../input/OptionSelector";
 
 export interface BrowserItemField {
@@ -24,7 +27,9 @@ export interface BrowserItemFormat {
 export interface BrowserProps {
 	data: WidgetDatasourceResponse<unknown>;
 	isMobile?: boolean;
+	editMode?: boolean;
 	formats: { [datasourceName: string]: BrowserItemFormat };
+	search: { [datasourceName: string]: SearchConfig };
 }
 
 interface BrowserItemProps {
@@ -48,7 +53,7 @@ const formatField = (value: any, format: string) => {
 };
 
 const BrowserItem = (props: BrowserItemProps) => {
-	console.log("item", props.format, props.data);
+	console.log("item", props.format);
 	return (
 		<div className="browser-item">
 			<div className="browser-item__title-bar">
@@ -88,6 +93,7 @@ const verifyData = (
 
 const Browser = (props: BrowserProps) => {
 	console.log("formats", props.formats);
+	console.log("search", props.search);
 	const data = verifyData(props.data);
 
 	const [selectedDatasource, setSelectedDatasource] = useState<string>();
@@ -100,7 +106,13 @@ const Browser = (props: BrowserProps) => {
 
 	return (
 		<div className="input_component">
-			<InputContainer title="Browse" expanded>
+			<InputContainer
+				title="Browse"
+				search={
+					selectedDatasource ? props.search[selectedDatasource] : undefined
+				}
+				expanded={!props.editMode}
+			>
 				{!selectedDatasource ? (
 					<OptionSelector
 						options={datasources}

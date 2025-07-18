@@ -29,9 +29,9 @@ const Input = (props: InputProps) => {
 	return (
 		<div className="input_component">
 			<InputContainer
-				title="Insert"
+				title={`Insert ${activeInsert ? activeInsert[0] : ""}`}
 				onBack={!!activeInsert ? () => setActiveInsert(null) : undefined}
-				expanded={!!activeInsert && props.isMobile}
+				expanded={!!activeInsert}
 			>
 				{!activeInsert ? (
 					<OptionSelector
