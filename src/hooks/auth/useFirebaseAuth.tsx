@@ -14,7 +14,8 @@ interface Auth0ToFirebaseResponse {
 }
 
 export function useFirebaseAuth(setError: (error: String | null) => void) {
-	const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
+	const { getAccessTokenSilently, loginWithRedirect, handleRedirectCallback } =
+		useAuth0();
 	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(false);
 
@@ -55,6 +56,18 @@ export function useFirebaseAuth(setError: (error: String | null) => void) {
 	useEffect(() => {
 		const trySignIn = async () => {
 			try {
+				if (
+					window.location.search.includes("code=") &&
+					window.location.search.includes("state=")
+				) {
+					await handleRedirectCallback();
+					window.history.replaceState(
+						{},
+						document.title,
+						window.location.pathname
+					);
+				}
+
 				const auth0Token = await getAccessTokenSilently();
 				if (auth0Token) {
 					await signInWithAuth0Token(auth0Token);
@@ -66,7 +79,12 @@ export function useFirebaseAuth(setError: (error: String | null) => void) {
 		};
 
 		trySignIn();
-	}, [getAccessTokenSilently, signInWithAuth0Token, loginWithRedirect]);
+	}, [
+		getAccessTokenSilently,
+		signInWithAuth0Token,
+		loginWithRedirect,
+		handleRedirectCallback,
+	]);
 
 	return { user, loading };
 }
