@@ -1,8 +1,8 @@
-me: Deploy Storybook to storybook.panelist.dev
+name: Deploy Storybook to storybook.panelist.dev
 
 on:
   push:
-    branches: [main]  # Triggers on push to main
+    branches: [main] # Triggers on push to main
 
 jobs:
   deploy:
