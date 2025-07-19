@@ -6,10 +6,7 @@ import {
 	type WidgetDatasourceResponse,
 	type WidgetDatasourceTypedDataResponse,
 } from "../../hooks/firestore/types";
-import InputContainer, {
-	type SearchConfig,
-	type SearchField,
-} from "../input/InputContainer";
+import InputContainer, { type SearchConfig } from "../input/InputContainer";
 import OptionSelector from "../input/OptionSelector";
 
 export interface BrowserItemField {

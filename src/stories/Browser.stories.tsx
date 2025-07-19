@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { fn } from "storybook/test";
-
-import Input from "../components/widget-components/Input";
 import Grid from "../components/widget-grid-infrastructure/Grid";
 import WidgetComponent from "../components/widget-grid-infrastructure/WidgetComponent";
-import { Component } from "react";
 import Browser from "../components/widget-components/Browser";
 
 const meta = {
@@ -147,135 +143,149 @@ export const Primary: Story = {
 };
 
 export const Search: Story = {
-    args: {
-        formats: {
-            "expenses": {
-                "title": {
-                    "name": "note"
-                },
+	args: {
+		formats: {
+			expenses: {
+				title: {
+					name: "note",
+				},
 
-                "secondaryFields": [{
-                    "name": "amount",
-                    "format": "currency"
-                }, {
-                    "format": "datetime",
-                    "name": "timestamp"
-                }],
+				secondaryFields: [
+					{
+						name: "amount",
+						format: "currency",
+					},
+					{
+						format: "datetime",
+						name: "timestamp",
+					},
+				],
 
-                "tag": {
-                    "name": "category"
-                }
-            }
-        },
+				tag: {
+					name: "category",
+				},
+			},
+		},
 
-        data: {
-            "expenses": [{
-                "title": "0",
+		data: {
+			expenses: [
+				{
+					title: "0",
 
-                "value": {
-                    "note": "Waterbottle for gym",
-                    "amount": "29",
+					value: {
+						note: "Waterbottle for gym",
+						amount: "29",
 
-                    "timestamp": {
-                        "seconds": 1752576841,
-                        "nanoseconds": 288000000
-                    },
+						timestamp: {
+							seconds: 1752576841,
+							nanoseconds: 288000000,
+						},
 
-                    "category": "Health"
-                }
-            }, {
-                "title": "1",
+						category: "Health",
+					},
+				},
+				{
+					title: "1",
 
-                "value": {
-                    "timestamp": {
-                        "seconds": 1752667071,
-                        "nanoseconds": 916000000
-                    },
+					value: {
+						timestamp: {
+							seconds: 1752667071,
+							nanoseconds: 916000000,
+						},
 
-                    "category": "Entertainment",
-                    "note": "Netflix",
-                    "amount": "14.99"
-                }
-            }, {
-                "title": "2",
+						category: "Entertainment",
+						note: "Netflix",
+						amount: "14.99",
+					},
+				},
+				{
+					title: "2",
 
-                "value": {
-                    "timestamp": {
-                        "seconds": 1752685333,
-                        "nanoseconds": 386000000
-                    },
+					value: {
+						timestamp: {
+							seconds: 1752685333,
+							nanoseconds: 386000000,
+						},
 
-                    "amount": "4.18",
-                    "note": "Sweet potato and tomatoes",
-                    "category": "groceries"
-                }
-            }, {
-                "title": "3",
+						amount: "4.18",
+						note: "Sweet potato and tomatoes",
+						category: "groceries",
+					},
+				},
+				{
+					title: "3",
 
-                "value": {
-                    "amount": "2.05",
-                    "category": "groceries",
+					value: {
+						amount: "2.05",
+						category: "groceries",
 
-                    "timestamp": {
-                        "seconds": 1752871419,
-                        "nanoseconds": 551000000
-                    },
+						timestamp: {
+							seconds: 1752871419,
+							nanoseconds: 551000000,
+						},
 
-                    "note": "Coke"
-                }
-            }, {
-                "title": "4",
+						note: "Coke",
+					},
+				},
+				{
+					title: "4",
 
-                "value": {
-                    "note": "Weekly",
-                    "category": "groceries",
+					value: {
+						note: "Weekly",
+						category: "groceries",
 
-                    "timestamp": {
-                        "seconds": 1752565729,
-                        "nanoseconds": 86000000
-                    },
+						timestamp: {
+							seconds: 1752565729,
+							nanoseconds: 86000000,
+						},
 
-                    "amount": "130.85"
-                }
-            }, {
-                "title": "5",
+						amount: "130.85",
+					},
+				},
+				{
+					title: "5",
 
-                "value": {
-                    "category": "groceries",
-                    "amount": "32.7",
+					value: {
+						category: "groceries",
+						amount: "32.7",
 
-                    "timestamp": {
-                        "seconds": 1752594592,
-                        "nanoseconds": 584000000
-                    },
+						timestamp: {
+							seconds: 1752594592,
+							nanoseconds: 584000000,
+						},
 
-                    "note": "Beef, chicken and walnuts"
-                }
-            }]
-        },
+						note: "Beef, chicken and walnuts",
+					},
+				},
+			],
+		},
 
-        isMobile: false,
-        editMode: false,
+		isMobile: false,
+		editMode: false,
 
-        search: {
-            "expenses": {
-                "fields": [{
-                    "operator": "==",
-                    "type": "text",
-                    "id": "search",
-                    "fieldName": "note"
-                }, {
-                    "id": "after",
-                    "operator": ">=",
-                    "type": "datetime",
-                    "fieldName": "timestamp"
-                }, {
-                    "fieldName": "timestamp",
-                    "id": "before",
-                    "type": "datetime",
-                    "operator": "<"
-                }]
-            }
-        }
-    }
+		search: {
+			expenses: {
+				fields: [
+					{
+						operator: "==",
+						type: "text",
+						id: "search",
+						fieldName: "note",
+					},
+					{
+						id: "after",
+						operator: ">=",
+						type: "datetime",
+						fieldName: "timestamp",
+					},
+					{
+						fieldName: "timestamp",
+						id: "before",
+						type: "datetime",
+						operator: "<",
+					},
+				],
+			},
+		},
+	},
 };

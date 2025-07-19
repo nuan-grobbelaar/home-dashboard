@@ -5,7 +5,6 @@ import { fn } from "storybook/test";
 import Input from "../components/widget-components/Input";
 import Grid from "../components/widget-grid-infrastructure/Grid";
 import WidgetComponent from "../components/widget-grid-infrastructure/WidgetComponent";
-import { Component } from "react";
 
 const meta = {
 	title: "WidgetComponents/Input",

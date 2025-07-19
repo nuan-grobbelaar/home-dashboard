@@ -1,8 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { fn } from "storybook/test";
-
-import Input from "../components/widget-components/Input";
 import Grid from "../components/widget-grid-infrastructure/Grid";
 import WidgetComponent from "../components/widget-grid-infrastructure/WidgetComponent";
 import Barchart from "../components/widget-components/Barchart";
@@ -96,7 +93,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
 	args: {
-        data: {
+		data: {
 			...meta.args?.data,
 			default: [
 				{ title: "Health", value: 200.15 },
@@ -113,9 +110,9 @@ export const Primary: Story = {
 			],
 		},
 
-        xAxisLabel: "",
-        yAxisLabel: "Amount Spent"
-    },
+		xAxisLabel: "",
+		yAxisLabel: "Amount Spent",
+	},
 };
 
 export const Stacked: Story = {

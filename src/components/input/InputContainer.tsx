@@ -1,8 +1,6 @@
 import { useState, type PropsWithChildren } from "react";
 import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
 import SearchIcon from "../../icons/SearchIcon";
-import TextInput from "./input-fields/TextInput";
-import DateInput from "./input-fields/DateInput";
 import ChevronUpIcon from "../../icons/ChevronUpIcon";
 import { inputRegistry, type InputType } from "./InputForm";
 
