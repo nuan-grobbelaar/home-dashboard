@@ -17,6 +17,9 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
+      - name: Remove CNAME from build folder
+        run: rm -f ./storybook-static/CNAME
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
