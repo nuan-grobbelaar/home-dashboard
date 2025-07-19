@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")!).render(
 		clientId="HlNxH7PrJSEiegWDPJ8aVLFOCV8lU3Zy"
 		authorizationParams={{
 			redirect_uri: window.location.origin,
-			audience: "https://dashboard.nuan.dev/api",
+			audience: "https://panelist.dev/api",
 		}}
 	>
 		<Provider store={store}>

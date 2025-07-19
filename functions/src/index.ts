@@ -15,7 +15,7 @@ import jwksClient from "jwks-rsa";
 admin.initializeApp();
 
 const AUTH0_DOMAIN = "dev-g4ors5whpl8izfzj.eu.auth0.com";
-const AUTH0_AUDIENCE = "https://dashboard.nuan.dev/api";
+const AUTH0_AUDIENCE = "https://panelist.dev/api";
 
 const client = jwksClient({
 	jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
