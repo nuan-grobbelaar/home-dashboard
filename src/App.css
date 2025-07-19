@@ -232,6 +232,8 @@ select {
 .input-container__container-items {
   margin-top: auto;
   margin-bottom: auto;
+
+  text-align: center;
 }
 
 .option-selector__option {
