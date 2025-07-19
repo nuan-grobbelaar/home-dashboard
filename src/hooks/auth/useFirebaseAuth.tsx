@@ -14,7 +14,7 @@ interface Auth0ToFirebaseResponse {
 }
 
 export function useFirebaseAuth(setError: (error: String | null) => void) {
-	const { getAccessTokenSilently } = useAuth0();
+	const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
 	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(false);
 
@@ -60,12 +60,13 @@ export function useFirebaseAuth(setError: (error: String | null) => void) {
 					await signInWithAuth0Token(auth0Token);
 				}
 			} catch (err) {
-				console.error("Auth0 token retrieval failed", err);
+				console.error("Auth0 token retrieval failed, attempting login", err);
+				await loginWithRedirect();
 			}
 		};
 
 		trySignIn();
-	}, [getAccessTokenSilently, signInWithAuth0Token]);
+	}, [getAccessTokenSilently, signInWithAuth0Token, loginWithRedirect]);
 
 	return { user, loading };
 }
