@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactElement } from "react";
+import type { CSSProperties, PropsWithChildren, ReactElement } from "react";
 import React, { useEffect, useMemo } from "react";
 import Filler from "./Filler";
 import {
@@ -16,6 +16,7 @@ interface GridProps<P extends GridItem> extends PropsWithChildren {
 	onSaveGridItem: (item: P) => void;
 	setError?: (error: String | null) => void;
 	ItemComponent: React.ComponentType<P>;
+	style?: CSSProperties;
 }
 
 const Grid = <P extends GridItem>(props: GridProps<P>) => {
@@ -140,6 +141,7 @@ const Grid = <P extends GridItem>(props: GridProps<P>) => {
 			style={{
 				gridTemplateColumns: `repeat(${props.columns}, 1fr)`,
 				gridTemplateRows: `repeat(${props.rows}, 1fr)`,
+				...props.style,
 			}}
 		>
 			{widgets}

@@ -15,6 +15,7 @@ export interface InputProps {
 }
 
 const Input = (props: InputProps) => {
+	console.log("input", props.data);
 	const [activeInsert, setActiveInsert] = useState<
 		[string, InsertQuery] | null
 	>(null);
