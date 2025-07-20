@@ -44,15 +44,19 @@ export interface WidgetComponentDocument {
 }
 
 export function isQuery(value: any): value is Query {
-	return (
-		value &&
-		typeof value === "object" &&
-		("insert" in value || "target" in value)
-	);
+	return value && typeof value === "object" && "collection" in value;
 }
 
 export function isInsertQuery(value: any): value is InsertQuery {
 	return value && typeof value === "object" && "insert" in value;
+}
+
+export function isSearchQuery(value: any): value is SearchQuery {
+	return (
+		value &&
+		typeof value === "object" &&
+		("target" in value || "groupBy" in value || "where" in value)
+	);
 }
 
 export interface WidgetComponentLayoutDocument {
@@ -141,9 +145,6 @@ export interface InsertField {
 
 export interface Query {
 	collection: string;
-	where?: Array<WhereClause>;
-	groupBy?: QueryGroupBy;
-	target?: string;
 }
 
 export interface QueryGroupBy {
@@ -157,6 +158,14 @@ export interface WhereClause {
 	operator: ">" | ">=" | "==" | "<" | "<=";
 	value: any;
 }
+
+export interface SearchFields {
+	where?: Array<WhereClause>;
+	groupBy?: QueryGroupBy;
+	target?: string;
+}
+
+export interface SearchQuery extends Query, SearchFields {}
 
 export interface InsertQuery extends Query {
 	insert: { [field: string]: InsertField };

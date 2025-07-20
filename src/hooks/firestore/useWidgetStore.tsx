@@ -18,9 +18,12 @@ import Barchart from "../../components/widget-components/Barchart";
 import type { LoadingState } from "../../components/widget-grid-infrastructure/Widget";
 import {
 	isInsertQuery,
+	isSearchQuery,
 	type ComponentName,
 	type Query,
 	type QueryGroupBy,
+	type SearchFields,
+	type SearchQuery,
 	type WidgetComponentDocument,
 	type WidgetComponentLayoutDocument,
 	type WidgetDatasourceResponse,
@@ -69,7 +72,7 @@ export function useWidgetStore(
 
 		loadWidgetDataFromDatasources();
 		const interval = setInterval(() => {
-			loadWidgetDataFromDatasource("default").then((data) => {
+			getWidgetDataFromDatasource("default").then((data) => {
 				if (data) {
 					setWidgetData((prev) => ({
 						...prev,
@@ -161,7 +164,7 @@ export function useWidgetStore(
 		return aggData;
 	}
 
-	function processData(rawData: DocumentData[], query: Query) {
+	function processData(rawData: DocumentData[], query: SearchQuery) {
 		if (query.groupBy === undefined || query.target === undefined)
 			return rawData;
 
@@ -207,7 +210,7 @@ export function useWidgetStore(
 
 	function buildQuery(
 		collectionRef: CollectionReference,
-		datasourceQuery: Query
+		datasourceQuery: SearchQuery
 	) {
 		if (!datasourceQuery.where) return collectionRef;
 
@@ -317,7 +320,10 @@ export function useWidgetStore(
 			});
 	}
 
-	async function loadWidgetDataFromDatasource(datasourceName: string) {
+	async function getWidgetDataFromDatasource(
+		datasourceName: string,
+		datasourceSearchQueryOverride?: SearchFields
+	) {
 		if (!widget.datasources || !(datasourceName in widget.datasources)) return;
 
 		const { datasource, datasourceQuery } = widget.datasources[datasourceName];
@@ -328,7 +334,13 @@ export function useWidgetStore(
 				if (isInsertQuery(datasourceQuery)) {
 					return datasourceQuery;
 				} else if (datasourceQuery.collection) {
-					return await queryWidgetDatasource(datasource, datasourceQuery);
+					const q = isSearchQuery(datasourceSearchQueryOverride)
+						? {
+								...datasourceQuery,
+								...datasourceSearchQueryOverride,
+						  }
+						: datasourceQuery;
+					return await queryWidgetDatasource(datasource, q);
 				} else {
 					console.warn(
 						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
@@ -344,11 +356,12 @@ export function useWidgetStore(
 		}
 	}
 
-	function loadWidgetDataFromDatasources() {
-		console.log(widget.datasources);
-		if (!widget.datasources) return;
-		for (const datasourceName of Object.keys(widget.datasources)) {
-			loadWidgetDataFromDatasource(datasourceName).then((data) => {
+	function loadWidgetDataFromDatasource(
+		datasourceName: string,
+		datasourceSearchQuery?: SearchFields
+	) {
+		getWidgetDataFromDatasource(datasourceName, datasourceSearchQuery).then(
+			(data) => {
 				if (data)
 					setWidgetData((prev) => ({
 						...prev,
@@ -358,7 +371,15 @@ export function useWidgetStore(
 					console.warn(
 						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
 					);
-			});
+			}
+		);
+	}
+
+	function loadWidgetDataFromDatasources() {
+		console.log(widget.datasources);
+		if (!widget.datasources) return;
+		for (const datasourceName of Object.keys(widget.datasources)) {
+			loadWidgetDataFromDatasource(datasourceName);
 		}
 	}
 
@@ -377,5 +398,10 @@ export function useWidgetStore(
 			});
 	}
 
-	return { widgetComponentLayout, widgetData, insertIntoWidgetDatasource };
+	return {
+		widgetComponentLayout,
+		widgetData,
+		insertIntoWidgetDatasource,
+		loadWidgetDataFromDatasource,
+	};
 }

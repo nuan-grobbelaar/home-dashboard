@@ -37,8 +37,12 @@ const Widget = (props: WidgetProps) => {
 		else return loading;
 	}, [loading, props.isLoading]);
 
-	const { widgetComponentLayout, widgetData, insertIntoWidgetDatasource } =
-		useWidgetStore(props, setLoading, props.setError);
+	const {
+		widgetComponentLayout,
+		widgetData,
+		insertIntoWidgetDatasource,
+		loadWidgetDataFromDatasource,
+	} = useWidgetStore(props, setLoading, props.setError);
 
 	const { loadWidgetDefinitions, widgetDefinitions } = useWidgetDefinitionStore(
 		false,
@@ -113,6 +117,7 @@ const Widget = (props: WidgetProps) => {
 										insert={insertIntoWidgetDatasource}
 										isMobile={props.isMobile}
 										editMode={props.editMode}
+										onQueryUpdate={loadWidgetDataFromDatasource}
 										{...componentProps}
 									/>
 								}

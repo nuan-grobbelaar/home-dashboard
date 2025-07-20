@@ -3,6 +3,7 @@ import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
 import SearchIcon from "../../icons/SearchIcon";
 import ChevronUpIcon from "../../icons/ChevronUpIcon";
 import { inputRegistry, type InputType } from "./InputForm";
+import type { SearchFields } from "../../hooks/firestore/types";
 
 export interface SearchField {
 	id: string;
@@ -66,6 +67,7 @@ export interface InputContainerProps extends PropsWithChildren {
 	onBack?: () => void;
 	expanded?: boolean;
 	search?: SearchConfig;
+	onSearch?: (datasourceName: string, query: SearchFields) => void;
 }
 
 const InputContainer = (props: InputContainerProps) => {

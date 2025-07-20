@@ -3,6 +3,7 @@ import {
 	isDatasourceDataMap,
 	isWidgetDatasourceDataResponse,
 	type DatasourceDataMap,
+	type SearchFields,
 	type WidgetDatasourceResponse,
 	type WidgetDatasourceTypedDataResponse,
 } from "../../hooks/firestore/types";
@@ -27,6 +28,7 @@ export interface BrowserProps {
 	editMode?: boolean;
 	formats: { [datasourceName: string]: BrowserItemFormat };
 	search?: { [datasourceName: string]: SearchConfig };
+	onSearch?: (datasourceName: string, query: SearchFields) => void;
 }
 
 interface BrowserItemProps {
@@ -52,7 +54,6 @@ const formatField = (value: any, format: string) => {
 };
 
 const BrowserItem = (props: BrowserItemProps) => {
-	console.log("item", props.format);
 	return (
 		<div className="browser-item">
 			<div className="browser-item__title-bar">
@@ -95,9 +96,7 @@ const verifyData = (
 };
 
 const Browser = (props: BrowserProps) => {
-	console.log("formats", props.formats);
-	console.log("search", props.search);
-	console.log("data browse", props.data);
+	console.log("query func", props.onSearch);
 	const data = verifyData(props.data);
 
 	const [selectedDatasource, setSelectedDatasource] = useState<string>();
@@ -117,6 +116,7 @@ const Browser = (props: BrowserProps) => {
 						? props.search[selectedDatasource]
 						: undefined
 				}
+				onSearch={props.onSearch}
 				expanded={!props.editMode}
 			>
 				{!selectedDatasource ? (
