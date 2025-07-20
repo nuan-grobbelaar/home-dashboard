@@ -1,9 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #fff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 input {
   all: unset;
 }
 
 select {
   all: unset;
+}
+
+.button {
+  border: 2px solid black;
+  color: black;
+  border-radius: 0;
+
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1em;
+
+  background-color: inherit;
 }
 
 .icon-container {
@@ -495,17 +524,6 @@ select {
 .input input[type=number] {
   /* Firefox */
   -moz-appearance: textfield;
-}
-
-button {
-  border: 2px solid black;
-  color: black;
-  border-radius: 0;
-
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1em;
-
-  background-color: inherit;
 }
 
 .input-select .action-button {

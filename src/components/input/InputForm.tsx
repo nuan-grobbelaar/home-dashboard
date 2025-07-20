@@ -105,7 +105,7 @@ const InputForm = (props: InputFormProps) => {
 							);
 						})}
 
-				<button type="submit" className="input-form__form-submit-button">
+				<button type="submit" className="button input-form__form-submit-button">
 					Submit
 				</button>
 			</form>

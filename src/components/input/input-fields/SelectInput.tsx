@@ -35,7 +35,7 @@ const SelectInput = (props: SelectInputProps) => {
 						required
 						// onChange={(e) => props.onInputChange(props.id, e.target.value)}
 					/>
-					<button className="action-button">
+					<button className="button action-button">
 						{dropdownOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
 					</button>
 				</div>

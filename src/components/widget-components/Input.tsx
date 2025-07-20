@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	isInsertQuery,
 	type InsertQuery,
@@ -21,17 +21,29 @@ const Input = (props: InputProps) => {
 	>(null);
 
 	const insertDatasources: Array<[datasourceName: string, query: InsertQuery]> =
-		Object.entries(props.data).filter((entry): entry is [string, InsertQuery] =>
-			isInsertQuery(entry[1])
+		useMemo(
+			() =>
+				Object.entries(props.data).filter(
+					(entry): entry is [string, InsertQuery] => isInsertQuery(entry[1])
+				),
+			[]
 		);
 
 	if (insertDatasources.length < 1) throw new Error("No insert datasources"); //TODO: need better handling
+
+	useEffect(() => {
+		if (insertDatasources.length == 1) setActiveInsert(insertDatasources[0]);
+	}, [insertDatasources, setActiveInsert]);
 
 	return (
 		<div className="input_component">
 			<InputContainer
 				title={`Insert ${activeInsert ? activeInsert[0] : ""}`}
-				onBack={!!activeInsert ? () => setActiveInsert(null) : undefined}
+				onBack={
+					!!activeInsert && insertDatasources.length > 1
+						? () => setActiveInsert(null)
+						: undefined
+				}
 				expanded={!!activeInsert}
 			>
 				{!activeInsert ? (

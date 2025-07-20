@@ -69,7 +69,7 @@ const Widget = (props: WidgetProps) => {
 		>
 			{(props.unsaved || props.editMode) && (
 				<button
-					className="close-button"
+					className="button close-button"
 					onClick={() => props.removeItem?.(props.id) ?? undefined}
 				>
 					x

@@ -28,7 +28,7 @@ const ComboBar = (props: InputContainerProps) => {
 			<div className="input-container__bar" data-active={isActive()}>
 				{props.onBack && (
 					<button
-						className="icon-button input-container__back-button"
+						className="button icon-button input-container__back-button"
 						onClick={props.onBack}
 					>
 						<ChevronLeftIcon />
@@ -39,7 +39,7 @@ const ComboBar = (props: InputContainerProps) => {
 				)}
 				{props.expanded && props.search && (
 					<button
-						className="icon-button input-container__search-button"
+						className="button icon-button input-container__search-button"
 						onClick={() => setSearchOpen((prev) => !prev)}
 					>
 						{searchOpen ? <ChevronUpIcon /> : <SearchIcon />}

@@ -36,106 +36,121 @@ const meta = {
 	argTypes: {
 		data: { control: "object" },
 	},
-	args: { insert: fn() },
+	args: { insert: fn(), data: {} },
 } satisfies Meta<typeof Input>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const categoryList = [
+	{
+		title: "Debt",
+		value: "Debt",
+	},
+	{
+		title: "Spending money ",
+		value: "Spending money ",
+	},
+	{
+		title: "Health",
+		value: "Health",
+	},
+	{
+		title: "pets",
+		value: "pets",
+	},
+	{
+		title: "groceries",
+		value: "groceries",
+	},
+	{
+		title: "Household",
+		value: "Household",
+	},
+	{
+		title: "Savings",
+		value: "Savings",
+	},
+	{
+		title: "Entertainment",
+		value: "Entertainment",
+	},
+	{
+		title: "utilities",
+		value: "utilities",
+	},
+	{
+		title: "Transportation",
+		value: "Transportation",
+	},
+	{
+		title: "Beauty",
+		value: "Beauty",
+	},
+	{
+		title: "Insurance",
+		value: "Insurance",
+	},
+];
+
+const categoryInsert = {
+	collection: "categories",
+	insert: {
+		color: {
+			type: "text",
+			required: false,
+			order: "2",
+		},
+		name: {
+			type: "text",
+			order: 1,
+			required: true,
+		},
+	},
+};
+
+const expenseInsert = {
+	collection: "expenses",
+	insert: {
+		amount: {
+			required: true,
+			type: "number",
+			order: 2,
+		},
+		timestamp: {
+			type: "datetime",
+			order: "3",
+			required: true,
+		},
+		category: {
+			type: "select",
+			datasource: "categories",
+			required: true,
+			order: 1,
+		},
+		note: {
+			order: 4,
+			type: "text",
+			required: false,
+		},
+	},
+};
+
 export const Primary: Story = {
 	args: {
 		data: {
-			category: {
-				collection: "categories",
-				insert: {
-					color: {
-						type: "text",
-						required: false,
-						order: "2",
-					},
-					name: {
-						type: "text",
-						order: 1,
-						required: true,
-					},
-				},
-			},
-			expense: {
-				collection: "expenses",
-				insert: {
-					amount: {
-						required: true,
-						type: "number",
-						order: 2,
-					},
-					timestamp: {
-						type: "datetime",
-						order: "3",
-						required: true,
-					},
-					category: {
-						type: "select",
-						datasource: "categories",
-						required: true,
-						order: 1,
-					},
-					note: {
-						order: 4,
-						type: "text",
-						required: false,
-					},
-				},
-			},
-			categories: [
-				{
-					title: "Debt",
-					value: "Debt",
-				},
-				{
-					title: "Spending money ",
-					value: "Spending money ",
-				},
-				{
-					title: "Health",
-					value: "Health",
-				},
-				{
-					title: "pets",
-					value: "pets",
-				},
-				{
-					title: "groceries",
-					value: "groceries",
-				},
-				{
-					title: "Household",
-					value: "Household",
-				},
-				{
-					title: "Savings",
-					value: "Savings",
-				},
-				{
-					title: "Entertainment",
-					value: "Entertainment",
-				},
-				{
-					title: "utilities",
-					value: "utilities",
-				},
-				{
-					title: "Transportation",
-					value: "Transportation",
-				},
-				{
-					title: "Beauty",
-					value: "Beauty",
-				},
-				{
-					title: "Insurance",
-					value: "Insurance",
-				},
-			],
+			expense: expenseInsert,
+			categories: categoryList,
+		},
+	},
+};
+
+export const Multi: Story = {
+	args: {
+		data: {
+			category: categoryInsert,
+			expense: expenseInsert,
+			categories: categoryList,
 		},
 	},
 };
