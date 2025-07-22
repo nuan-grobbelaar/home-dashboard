@@ -4,9 +4,9 @@ import {
 	type InsertQuery,
 	type WidgetDatasourceResponse,
 } from "../../hooks/firestore/types";
-import InputForm from "../input/InputForm";
 import OptionSelector from "../input/OptionSelector";
 import InputContainer from "../input/InputContainer";
+import InsertForm from "../input/InsertForm";
 
 export interface InputProps {
 	data: WidgetDatasourceResponse<unknown>;
@@ -45,6 +45,7 @@ const Input = (props: InputProps) => {
 						: undefined
 				}
 				expanded={!!activeInsert}
+				centerItemsVeritcally
 			>
 				{!activeInsert ? (
 					<OptionSelector
@@ -53,7 +54,7 @@ const Input = (props: InputProps) => {
 						onSelect={(option) => setActiveInsert(option)}
 					/>
 				) : (
-					<InputForm
+					<InsertForm
 						data={props.data}
 						insert={(data: { [field: string]: any }) =>
 							props.insert(data, activeInsert[0])

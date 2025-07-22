@@ -3,7 +3,7 @@ import {
 	isDatasourceDataMap,
 	isWidgetDatasourceDataResponse,
 	type DatasourceDataMap,
-	type SearchFields,
+	type SearchParameters,
 	type WidgetDatasourceResponse,
 	type WidgetDatasourceTypedDataResponse,
 } from "../../hooks/firestore/types";
@@ -28,7 +28,11 @@ export interface BrowserProps {
 	editMode?: boolean;
 	formats: { [datasourceName: string]: BrowserItemFormat };
 	search?: { [datasourceName: string]: SearchConfig };
-	onSearch?: (datasourceName: string, query: SearchFields) => void;
+	onSearch?: (
+		datasourceName: string,
+		query: SearchParameters,
+		setError?: (err: React.ReactNode[]) => void
+	) => void;
 }
 
 interface BrowserItemProps {
@@ -100,6 +104,8 @@ const Browser = (props: BrowserProps) => {
 	const data = verifyData(props.data);
 
 	const [selectedDatasource, setSelectedDatasource] = useState<string>();
+	const [infoItems, setInfoItems] = useState<React.ReactNode[]>();
+	const [errorItems, setErrorItems] = useState<React.ReactNode[]>();
 
 	const datasources = useMemo(() => Object.keys(data), [data]);
 
@@ -110,14 +116,20 @@ const Browser = (props: BrowserProps) => {
 	return (
 		<div className="input_component">
 			<InputContainer
-				title="Browse"
+				title={`Browse ${selectedDatasource}`}
 				search={
 					selectedDatasource && props.search
-						? props.search[selectedDatasource]
+						? {
+								...props.search[selectedDatasource],
+								datasourceName: selectedDatasource,
+						  }
 						: undefined
 				}
 				onSearch={props.onSearch}
 				expanded={!props.editMode}
+				setInfoItems={setInfoItems}
+				errorItems={errorItems}
+				setErrorItems={setErrorItems}
 			>
 				{!selectedDatasource ? (
 					<OptionSelector
@@ -133,11 +145,10 @@ const Browser = (props: BrowserProps) => {
 								format={props.formats[selectedDatasource]}
 							/>
 						)}
-						// onSelect={(option) => setType(option.type)}
-					/>
-					// .map((d) =>
-					// 	Object.entries(d.value).map(([_, v]) => <span>{"" + v}</span>)
-					// )
+					>
+						{errorItems}
+						{infoItems}
+					</OptionSelector>
 				)}
 			</InputContainer>
 		</div>

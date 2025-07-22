@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type PropsWithChildren } from "react";
 
-export interface OptionSelectorProps {
+export interface OptionSelectorProps extends PropsWithChildren {
 	options: any[];
 	onSelect?: (option: any) => void;
 	displayCallback?: (option: any) => void;
@@ -21,6 +21,7 @@ const OptionSelector = (props: OptionSelectorProps) => {
 
 	return (
 		<>
+			{props.children}
 			{props.options.map((option, i) => (
 				<div
 					key={i}

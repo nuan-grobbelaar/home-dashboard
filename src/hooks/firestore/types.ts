@@ -136,11 +136,12 @@ export interface WidgetComponentDefinitionDocument {
 	props: { [key: string]: any };
 }
 
-export interface InsertField {
+export interface InputField {
 	type: InputType;
-	required: boolean;
+	required?: boolean;
 	datasource?: string;
 	order?: number;
+	initialValue?: boolean;
 }
 
 export interface Query {
@@ -159,16 +160,16 @@ export interface WhereClause {
 	value: any;
 }
 
-export interface SearchFields {
+export interface SearchParameters {
 	where?: Array<WhereClause>;
 	groupBy?: QueryGroupBy;
 	target?: string;
 }
 
-export interface SearchQuery extends Query, SearchFields {}
+export interface SearchQuery extends Query, SearchParameters {}
 
 export interface InsertQuery extends Query {
-	insert: { [field: string]: InsertField };
+	insert: { [field: string]: InputField };
 }
 
 export interface WidgetDatasourceDefinitionDocument {

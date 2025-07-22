@@ -22,8 +22,9 @@ import {
 	type ComponentName,
 	type Query,
 	type QueryGroupBy,
-	type SearchFields,
+	type SearchParameters,
 	type SearchQuery,
+	type WhereClause,
 	type WidgetComponentDocument,
 	type WidgetComponentLayoutDocument,
 	type WidgetDatasourceResponse,
@@ -208,65 +209,82 @@ export function useWidgetStore(
 		return sortedAggregatedData;
 	}
 
+	function addWhereClause(
+		whereClause: WhereClause,
+		whereClauses: Array<QueryFieldFilterConstraint>
+	) {
+		if (whereClause.value == "currentMonth") {
+			const now = new Date();
+			const currentDay = now.getDate();
+			const currentMonth = now.getMonth();
+			const currentYear = now.getFullYear();
+
+			// TODO: configurable start date
+			const periodStart = 14;
+
+			if (currentDay < periodStart) {
+				whereClauses.push(
+					where(
+						"timestamp",
+						">=",
+						new Date(currentYear, currentMonth - 1, periodStart)
+					)
+				);
+				whereClauses.push(
+					where(
+						"timestamp",
+						"<",
+						new Date(currentYear, currentMonth, periodStart)
+					)
+				);
+			} else {
+				whereClauses.push(
+					where(
+						"timestamp",
+						">=",
+						new Date(currentYear, currentMonth, periodStart)
+					)
+				);
+				whereClauses.push(
+					where(
+						"timestamp",
+						"<",
+						new Date(currentYear, currentMonth + 1, periodStart)
+					)
+				);
+			}
+		} else
+			whereClauses.push(
+				where(whereClause.field, whereClause.operator, whereClause.value)
+			);
+	}
+
 	function buildQuery(
 		collectionRef: CollectionReference,
-		datasourceQuery: SearchQuery
+		datasourceQuery: SearchQuery,
+		indexed: boolean = true
 	) {
-		if (!datasourceQuery.where) return collectionRef;
+		if (!datasourceQuery.where) return { ref: collectionRef };
 
 		const whereClauses: Array<QueryFieldFilterConstraint> = [];
+		const unusedWhereClauses: Array<WhereClause> = [];
 
-		for (const wc of datasourceQuery.where) {
-			// Special case
-			if (wc.value == "currentMonth") {
-				const now = new Date();
-				const currentDay = now.getDate();
-				const currentMonth = now.getMonth();
-				const currentYear = now.getFullYear();
-
-				// TODO: configurable start date
-				const periodStart = 14;
-
-				if (currentDay < periodStart) {
-					whereClauses.push(
-						where(
-							"timestamp",
-							">=",
-							new Date(currentYear, currentMonth - 1, periodStart)
-						)
-					);
-					whereClauses.push(
-						where(
-							"timestamp",
-							"<",
-							new Date(currentYear, currentMonth, periodStart)
-						)
-					);
-				} else {
-					whereClauses.push(
-						where(
-							"timestamp",
-							">=",
-							new Date(currentYear, currentMonth, periodStart)
-						)
-					);
-					whereClauses.push(
-						where(
-							"timestamp",
-							"<",
-							new Date(currentYear, currentMonth + 1, periodStart)
-						)
-					);
-				}
-			} else whereClauses.push(where(wc.field, wc.operator, wc.value));
+		if (indexed) {
+			for (const wc of datasourceQuery.where) {
+				addWhereClause(wc, whereClauses);
+			}
+		} else if (datasourceQuery.where.length > 0) {
+			addWhereClause(datasourceQuery.where[0], whereClauses);
+			unusedWhereClauses.push(...datasourceQuery.where.slice(1));
 		}
 
-		return query(collectionRef, ...whereClauses);
+		return { ref: query(collectionRef, ...whereClauses), unusedWhereClauses };
 	}
 
 	async function queryWidgetDatasource(
 		datasource: DocumentReference,
-		datasourceQuery: Query
+		datasourceQuery: Query,
+		setError?: (err: React.ReactNode[]) => void
 	) {
 		const user = auth.currentUser;
 		if (!user) throw new Error("Not authenticated");
@@ -276,23 +294,106 @@ export function useWidgetStore(
 			datasourceQuery.collection
 		);
 
-		const q = buildQuery(datasourceCollectionRef, datasourceQuery);
+		console.log("search query 1", datasourceQuery);
 
-		const dataSnapshot = await getDocs(q);
+		try {
+			const { ref } = buildQuery(datasourceCollectionRef, datasourceQuery);
+			const dataSnapshot = await getDocs(ref);
 
-		console.log(datasourceQuery, dataSnapshot);
+			if (!dataSnapshot.empty) {
+				const rawData = dataSnapshot.docs.map((d) => d.data());
+				const aggregatedData = processData(rawData, datasourceQuery);
 
-		if (!dataSnapshot.empty) {
-			const rawData = dataSnapshot.docs.map((d) => d.data());
-			const aggregatedData = processData(rawData, datasourceQuery);
+				const data = Object.entries(aggregatedData).map(([key, value]) => ({
+					title: key,
+					value: value,
+				}));
 
-			const data = Object.entries(aggregatedData).map(([key, value]) => ({
-				title: key,
-				value: value,
-			}));
+				if (setError) setError([]);
+				return data;
+			}
+			if (setError) setError([]);
+		} catch (error: any) {
+			if (
+				error.code === "failed-precondition" &&
+				error.message.includes("create it here")
+			) {
+				console.warn(
+					"Missing composite index, using less efficient fallback. Error:",
+					error.message,
+					setError
+				);
 
-			return data;
-		} else return [];
+				if (setError) {
+					const match = error.message.match(/https?:\/\/[^\s]+/);
+					const indexUrl = match ? match[0] : null;
+					setError([
+						<span>
+							Missing composite index, using less efficient fallback, consider
+							setting an index{" "}
+							<a href={indexUrl} target="_blank">
+								here
+							</a>
+						</span>,
+					]);
+				}
+
+				const { ref, unusedWhereClauses } = buildQuery(
+					datasourceCollectionRef,
+					datasourceQuery,
+					false
+				);
+
+				console.log("fallback", ref, unusedWhereClauses);
+
+				const dataSnapshot = await getDocs(ref);
+
+				if (!dataSnapshot.empty) {
+					const rawData = dataSnapshot.docs.map((d) => d.data());
+					const filteredData = unusedWhereClauses
+						? filterData(rawData, unusedWhereClauses)
+						: rawData;
+					const aggregatedData = processData(filteredData, datasourceQuery);
+
+					const data = Object.entries(aggregatedData).map(([key, value]) => ({
+						title: key,
+						value: value,
+					}));
+
+					return data;
+				}
+			} else {
+				throw error;
+			}
+		}
+
+		return [];
+	}
+
+	function filterData(
+		data: DocumentData[],
+		clauses: WhereClause[]
+	): DocumentData[] {
+		return data.filter((item) =>
+			clauses.every(({ field, operator, value }) => {
+				const fieldValue = item[field];
+
+				switch (operator) {
+					case ">":
+						return fieldValue > value;
+					case ">=":
+						return fieldValue >= value;
+					case "==":
+						return fieldValue == value;
+					case "<":
+						return fieldValue < value;
+					case "<=":
+						return fieldValue <= value;
+					default:
+						return false;
+				}
+			})
+		);
 	}
 
 	function insertIntoWidgetDatasource(
@@ -322,7 +423,8 @@ export function useWidgetStore(
 
 	async function getWidgetDataFromDatasource(
 		datasourceName: string,
-		datasourceSearchQueryOverride?: SearchFields
+		datasourceSearchQueryOverride?: SearchParameters,
+		setError?: (err: React.ReactNode[]) => void
 	) {
 		if (!widget.datasources || !(datasourceName in widget.datasources)) return;
 
@@ -340,7 +442,7 @@ export function useWidgetStore(
 								...datasourceSearchQueryOverride,
 						  }
 						: datasourceQuery;
-					return await queryWidgetDatasource(datasource, q);
+					return await queryWidgetDatasource(datasource, q, setError);
 				} else {
 					console.warn(
 						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
@@ -358,21 +460,24 @@ export function useWidgetStore(
 
 	function loadWidgetDataFromDatasource(
 		datasourceName: string,
-		datasourceSearchQuery?: SearchFields
+		datasourceSearchQuery?: SearchParameters,
+		setError?: (err: React.ReactNode[]) => void
 	) {
-		getWidgetDataFromDatasource(datasourceName, datasourceSearchQuery).then(
-			(data) => {
-				if (data)
-					setWidgetData((prev) => ({
-						...prev,
-						[datasourceName]: data,
-					}));
-				else
-					console.warn(
-						`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
-					);
-			}
-		);
+		getWidgetDataFromDatasource(
+			datasourceName,
+			datasourceSearchQuery,
+			setError
+		).then((data) => {
+			if (data)
+				setWidgetData((prev) => ({
+					...prev,
+					[datasourceName]: data,
+				}));
+			else
+				console.warn(
+					`Widget ${widget.id} has an invalid datasource: ${datasourceName}`
+				);
+		});
 	}
 
 	function loadWidgetDataFromDatasources() {

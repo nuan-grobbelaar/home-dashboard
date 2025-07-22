@@ -11,7 +11,12 @@ const TextInput = (props: TextInputProps) => {
 				name={props.id}
 				type="text"
 				value={props.value ? props.value : ""}
-				onChange={(e) => props.onInputChange(props.id, e.target.value)}
+				onChange={(e) =>
+					props.onInputChange(
+						props.id,
+						e.target.value !== "" ? e.target.value : null
+					)
+				}
 			/>
 		</div>
 	);

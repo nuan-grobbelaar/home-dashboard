@@ -117,7 +117,7 @@ const Widget = (props: WidgetProps) => {
 										insert={insertIntoWidgetDatasource}
 										isMobile={props.isMobile}
 										editMode={props.editMode}
-										onQueryUpdate={loadWidgetDataFromDatasource}
+										onSearch={loadWidgetDataFromDatasource}
 										{...componentProps}
 									/>
 								}
