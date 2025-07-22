@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import Grid from "../components/widget-grid-infrastructure/Grid";
 import WidgetComponent from "../components/widget-grid-infrastructure/WidgetComponent";
 import Browser from "../components/widget-components/Browser";
+import { fn } from "storybook/internal/test";
 
 const meta = {
 	title: "WidgetComponents/Browser",
@@ -35,7 +36,7 @@ const meta = {
 		data: { control: "object" },
 		formats: { control: "object" },
 	},
-	args: {},
+	args: { onSearch: fn() },
 } satisfies Meta<typeof Browser>;
 
 export default meta;
@@ -265,6 +266,7 @@ export const Search: Story = {
 
 		search: {
 			expenses: {
+				datasourceName: "expenses",
 				fields: [
 					{
 						operator: "==",
